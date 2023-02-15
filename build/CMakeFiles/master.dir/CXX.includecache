@@ -7,10 +7,12 @@
 #IncludeRegexTransform: 
 
 /home/pi/Master-Thesis/main.cpp
-ctime
+RPLidar/rplidar.h
+/home/pi/Master-Thesis/RPLidar/rplidar.h
+chrono
 -
 iostream
 -
-raspicam/raspicam_cv.h
+thread
 -
 

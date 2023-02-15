@@ -1758,6 +1758,18 @@
 			"value" : "P4COMMAND-NOTFOUND"
 		},
 		{
+			"name" : "RPLidar_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for RPLidar."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/local/lib/cmake/RPLidar"
+		},
+		{
 			"name" : "SITE",
 			"properties" : 
 			[

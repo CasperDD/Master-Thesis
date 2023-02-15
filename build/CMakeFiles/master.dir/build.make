@@ -135,6 +135,7 @@ master: /usr/local/lib/arm-linux-gnueabihf/libopencv_wechat_qrcode.so.4.7.0
 master: /usr/local/lib/arm-linux-gnueabihf/libopencv_xfeatures2d.so.4.7.0
 master: /usr/local/lib/arm-linux-gnueabihf/libopencv_xobjdetect.so.4.7.0
 master: /usr/local/lib/arm-linux-gnueabihf/libopencv_xphoto.so.4.7.0
+master: /usr/local/lib/libRPLidar.a
 master: /usr/lib/arm-linux-gnueabihf/libmmal_core.so
 master: /usr/lib/arm-linux-gnueabihf/libmmal_util.so
 master: /usr/lib/arm-linux-gnueabihf/libmmal.so

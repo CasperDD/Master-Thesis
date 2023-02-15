@@ -320,6 +320,9 @@ OpenCV_DIR:PATH=/usr/local/lib/arm-linux-gnueabihf/cmake/opencv4
 //Path to a program.
 P4COMMAND:FILEPATH=P4COMMAND-NOTFOUND
 
+//The directory containing a CMake configuration file for RPLidar.
+RPLidar_DIR:PATH=/usr/local/lib/cmake/RPLidar
+
 //Name of the computer/site where compile is being run
 SITE:STRING=raspberrypi
 
