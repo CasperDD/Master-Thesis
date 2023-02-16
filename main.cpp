@@ -97,9 +97,8 @@ int main(int argc, char *argv[])
 {
 	std::cout << "RPLidar C++ Interface Demo" << std::endl;
 	std::cout << "--------------------------" << std::endl;
-	std::cout << "Jordan Ford, 2018    " << std::endl;
 
-	RPLidar rp("/dev/ttyAMA0");
+	RPLidar rp("/dev/ttyUSB0");
 
 	rp.startMotor();
 
@@ -128,6 +127,10 @@ int main(int argc, char *argv[])
 	}
 
 	std::cout << "After" << std::endl;
+
+    rp.stopMotor();
+
+    std::this_thread::sleep_for(milliseconds(5000));
 
 	return 0;
 }
