@@ -4,7 +4,7 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/pi/Master-Thesis
+SourceDirectory: /home/pi/Master-Thesis/CPP
 BuildDirectory: /home/pi/Master-Thesis/build
 
 # Where to place the cost data store
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/home/pi/Master-Thesis"
+ConfigureCommand: "/usr/bin/cmake" "/home/pi/Master-Thesis/CPP"
 MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
@@ -57,9 +57,9 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: /usr/bin/git
+UpdateCommand: 
 UpdateOptions: 
-UpdateType: git
+UpdateType: 
 
 # Compiler info
 Compiler: /usr/bin/arm-linux-gnueabihf-g++

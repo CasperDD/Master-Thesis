@@ -6,13 +6,17 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/Master-Thesis/main.cpp
-RPLidar/rplidar.h
-/home/pi/Master-Thesis/RPLidar/rplidar.h
-chrono
--
+/home/pi/Master-Thesis/CPP/main.cpp
 iostream
 -
+chrono
+-
 thread
+-
+stdio.h
+-
+stdlib.h
+-
+pigpio.h
 -
 

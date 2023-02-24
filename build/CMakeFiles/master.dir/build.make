@@ -62,7 +62,7 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pi/Master-Thesis
+CMAKE_SOURCE_DIR = /home/pi/Master-Thesis/CPP
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/pi/Master-Thesis/build
@@ -77,17 +77,17 @@ include CMakeFiles/master.dir/progress.make
 include CMakeFiles/master.dir/flags.make
 
 CMakeFiles/master.dir/main.cpp.o: CMakeFiles/master.dir/flags.make
-CMakeFiles/master.dir/main.cpp.o: ../main.cpp
+CMakeFiles/master.dir/main.cpp.o: /home/pi/Master-Thesis/CPP/main.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/Master-Thesis/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/master.dir/main.cpp.o"
-	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/master.dir/main.cpp.o -c /home/pi/Master-Thesis/main.cpp
+	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/master.dir/main.cpp.o -c /home/pi/Master-Thesis/CPP/main.cpp
 
 CMakeFiles/master.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/master.dir/main.cpp.i"
-	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/Master-Thesis/main.cpp > CMakeFiles/master.dir/main.cpp.i
+	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/Master-Thesis/CPP/main.cpp > CMakeFiles/master.dir/main.cpp.i
 
 CMakeFiles/master.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/master.dir/main.cpp.s"
-	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/Master-Thesis/main.cpp -o CMakeFiles/master.dir/main.cpp.s
+	/usr/bin/arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/Master-Thesis/CPP/main.cpp -o CMakeFiles/master.dir/main.cpp.s
 
 # Object files for target master
 master_OBJECTS = \
@@ -173,6 +173,6 @@ CMakeFiles/master.dir/clean:
 .PHONY : CMakeFiles/master.dir/clean
 
 CMakeFiles/master.dir/depend:
-	cd /home/pi/Master-Thesis/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Master-Thesis /home/pi/Master-Thesis /home/pi/Master-Thesis/build /home/pi/Master-Thesis/build /home/pi/Master-Thesis/build/CMakeFiles/master.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/pi/Master-Thesis/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Master-Thesis/CPP /home/pi/Master-Thesis/CPP /home/pi/Master-Thesis/build /home/pi/Master-Thesis/build /home/pi/Master-Thesis/build/CMakeFiles/master.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/master.dir/depend
 

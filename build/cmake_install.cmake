@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/Master-Thesis
+# Install script for directory: /home/pi/Master-Thesis/CPP
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

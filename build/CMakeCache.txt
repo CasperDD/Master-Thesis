@@ -339,13 +339,7 @@ SVNCOMMAND:FILEPATH=SVNCOMMAND-NOTFOUND
 master_BINARY_DIR:STATIC=/home/pi/Master-Thesis/build
 
 //Value Computed by CMake
-master_SOURCE_DIR:STATIC=/home/pi/Master-Thesis
-
-//The directory containing a CMake configuration file for pigpio.
-pigpio_DIR:PATH=pigpio_DIR-NOTFOUND
-
-//The directory containing a CMake configuration file for raspicam.
-raspicam_DIR:PATH=raspicam_DIR-NOTFOUND
+master_SOURCE_DIR:STATIC=/home/pi/Master-Thesis/CPP
 
 
 ########################
@@ -442,7 +436,7 @@ CMAKE_HAVE_PTHREAD_CREATE:INTERNAL=1
 CMAKE_HAVE_PTHREAD_H:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=/home/pi/Master-Thesis
+CMAKE_HOME_DIRECTORY:INTERNAL=/home/pi/Master-Thesis/CPP
 //Install .so files without execute permission.
 CMAKE_INSTALL_SO_NO_EXE:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
