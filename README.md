@@ -1,6 +1,3 @@
 # Master-Thesis
 Git token:
-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
-
-New Token:
-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
+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
