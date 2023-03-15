@@ -7,7 +7,8 @@ class rcCar:
     forward = 1
     backward = 0
     
-    # def __init__(self):
+    def __init__(self):
+        self.control.initGPIOPins()
         
 
     def forwards(self):
