@@ -15,7 +15,7 @@
 
 
 # def get_output_layers(net):
-    
+
 #     layer_names = net.getLayerNames()
 #     try:
 #         output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
@@ -35,7 +35,7 @@
 
 #     cv2.putText(img, label, (x-10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-    
+
 # image = cv2.imread(args.image)
 
 # Width = image.shape[1]
@@ -89,7 +89,7 @@
 #     except:
 #         i = i[0]
 #         box = boxes[i]
-    
+
 #     x = box[0]
 #     y = box[1]
 #     w = box[2]
@@ -98,12 +98,9 @@
 
 # cv2.imshow("object detection", image)
 # cv2.waitKey()
-    
+
 # cv2.imwrite("object-detection.jpg", image)
 # cv2.destroyAllWindows()
-
-
-
 
 
 # import cv2
@@ -166,9 +163,6 @@
 # cv2.imshow('window', img_src)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
-
-
-
 
 
 # from picamera.array import PiRGBArray
@@ -253,89 +247,165 @@
 #     # if the `q` key was pressed, break from the loop
 #     if key == ord("q"):
 #         break
-    
+
 #     cv2.waitKey(1)
 
 # cv2.destroyAllWindows()
 
 
+# import cv2
+# import numpy as np
+# from picamera.array import PiRGBArray
+# from picamera import PiCamera
 
+
+# def imageFlip(image):
+#     image = cv2.flip(image, 0)
+#     image = cv2.flip(image, 1)
+#     return image
+
+
+# camera = PiCamera()
+# camera.resolution = (160, 120)
+# camera.framerate = 32
+# rawCapture = PiRGBArray(camera, size=camera.resolution)
+
+# classes_names = open('coco.names').read().strip().split('\n')
+# np.random.seed(42)
+# colors_rnd = np.random.randint(0, 255, size=(
+#     len(classes_names), 3), dtype='uint8')
+
+# net_yolo = cv2.dnn.readNetFromDarknet('yolov3.cfg', '/home/pi/yolov3.weights')
+# net_yolo.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+# net_yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
+# ln = net_yolo.getLayerNames()
+# ln = [ln[i - 1] for i in net_yolo.getUnconnectedOutLayers()]
+
+# for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+#     img_src = frame.array
+
+#     img_src = imageFlip(img_src)
+
+#     blob_img = cv2.dnn.blobFromImage(
+#         img_src, 1/255.0, (128, 128), swapRB=True, crop=False)
+#     r_blob = blob_img[0, 0, :, :]
+
+#     net_yolo.setInput(blob_img)
+#     outputs = net_yolo.forward(ln)
+
+#     boxes = []
+#     confidences = []
+#     classIDs = []
+#     h, w = img_src.shape[:2]
+
+#     for output in outputs:
+#         for detection in output:
+#             scores_yolo = detection[5:]
+#             classID = np.argmax(scores_yolo)
+#             confidence = scores_yolo[classID]
+#             if confidence > 0.5:
+#                 box_rect = detection[:4] * np.array([w, h, w, h])
+#                 (centerX, centerY, width, height) = box_rect.astype("int")
+#                 x_c = int(centerX - (width / 2))
+#                 y_c = int(centerY - (height / 2))
+#                 box_rect = [x_c, y_c, int(width), int(height)]
+#                 boxes.append(box_rect)
+#                 confidences.append(float(confidence))
+#                 classIDs.append(classID)
+#                 print("x_c: ", x_c)
+
+#     indices_yolo = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+#     if len(indices_yolo) > 0:
+#         for i in indices_yolo.flatten():
+#             (x, y) = (boxes[i][0], boxes[i][1])
+#             (w, h) = (boxes[i][2], boxes[i][3])
+#             color = [int(c) for c in colors_rnd[classIDs[i]]]
+#             cv2.rectangle(img_src, (x, y), (x + w, y + h), color, 3)
+#             text = "{}: {:.4f}".format(
+#                 classes_names[classIDs[i]], confidences[i])
+#             cv2.putText(img_src, text, (x, y - 5),
+#                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+
+#     cv2.imshow('window', img_src)
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+#     rawCapture.truncate(0)
+
+# cv2.destroyAllWindows()
 
 
 import cv2
 import numpy as np
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+from camera import Camera
 
 
-def imageFlip(image):
-        image = cv2.flip(image, 0)
-        image = cv2.flip(image, 1)
-        return image
+class YOLO:
+    def __init__(self):
+        # self.picam = Camera()
+        # self.picam.setup()
+        # self.rawCapture = self.picam.raw_capture
 
+        # self.camera = PiCamera()
+        # self.camera.resolution = (160, 120)
+        # self.camera.framerate = 32
+        # self.rawCapture = PiRGBArray(self.camera, size=self.camera.resolution)
 
-camera = PiCamera()
-camera.resolution = (160, 120)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=camera.resolution)
+        self.classes_names = open('coco.names').read().strip().split('\n')
+        np.random.seed(42)
+        self.colors_rnd = np.random.randint(0, 255, size=(len(self.classes_names), 3), dtype='uint8')
 
-classes_names = open('coco.names').read().strip().split('\n')
-np.random.seed(42)
-colors_rnd = np.random.randint(0, 255, size=(len(classes_names), 3), dtype='uint8')
+        self.net_yolo = cv2.dnn.readNetFromDarknet('yolov3.cfg', '/home/pi/yolov3.weights')
+        self.net_yolo.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+        self.net_yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
-net_yolo = cv2.dnn.readNetFromDarknet('yolov3.cfg', '/home/pi/yolov3.weights')
-net_yolo.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-net_yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+        self.ln = self.net_yolo.getLayerNames()
+        self.ln = [self.ln[i - 1] for i in self.net_yolo.getUnconnectedOutLayers()]
 
-ln = net_yolo.getLayerNames()
-ln = [ln[i - 1] for i in net_yolo.getUnconnectedOutLayers()]
+    def run_yolo(self, img_src):
+        blob_img = cv2.dnn.blobFromImage(img_src, 1/255.0, (128, 128), swapRB=True, crop=False)
+        r_blob = blob_img[0, 0, :, :]
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    img_src = frame.array
+        self.net_yolo.setInput(blob_img)
+        outputs = self.net_yolo.forward(self.ln)
 
-    img_src = imageFlip(img_src)
-    
-    blob_img = cv2.dnn.blobFromImage(img_src, 1/255.0, (128, 128), swapRB=True, crop=False)
-    r_blob = blob_img[0, 0, :, :]
-    
-    net_yolo.setInput(blob_img)
-    outputs = net_yolo.forward(ln)
+        boxes = []
+        confidences = []
+        classIDs = []
+        h, w = img_src.shape[:2]
 
-    boxes = []
-    confidences = []
-    classIDs = []
-    h, w = img_src.shape[:2]
+        for output in outputs:
+            for detection in output:
+                scores_yolo = detection[5:]
+                classID = np.argmax(scores_yolo)
+                confidence = scores_yolo[classID]
+                if confidence > 0.5:
+                    box_rect = detection[:4] * np.array([w, h, w, h])
+                    (centerX, centerY, width, height) = box_rect.astype("int")
+                    x_c = int(centerX - (width / 2))
+                    y_c = int(centerY - (height / 2))
+                    box_rect = [x_c, y_c, int(width), int(height)]
+                    boxes.append(box_rect)
+                    confidences.append(float(confidence))
+                    classIDs.append(classID)
+                    # print("x_c: ", x_c)
 
-    for output in outputs:
-        for detection in output:
-            scores_yolo = detection[5:]
-            classID = np.argmax(scores_yolo)
-            confidence = scores_yolo[classID]
-            if confidence > 0.5:
-                box_rect = detection[:4] * np.array([w, h, w, h])
-                (centerX, centerY, width, height) = box_rect.astype("int")
-                x_c = int(centerX - (width / 2))
-                y_c = int(centerY - (height / 2))
-                box_rect = [x_c, y_c, int(width), int(height)]
-                boxes.append(box_rect)
-                confidences.append(float(confidence))
-                classIDs.append(classID)
-                print("x_c: ", x_c)
+        indices_yolo = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+        detected_objects = []
+        if len(indices_yolo) > 0:
+            for i in indices_yolo.flatten():
+                (x, y) = (boxes[i][0], boxes[i][1])
+                (w, h) = (boxes[i][2], boxes[i][3])
+                detected_objects.append((x, y))
+                color = [int(c) for c in self.colors_rnd[classIDs[i]]]
+                cv2.rectangle(img_src, (x, y), (x + w, y + h), color, 3)
+                text = "{}: {:.4f}".format(self.classes_names[classIDs[i]], confidences[i])
+                cv2.putText(img_src, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
-    indices_yolo = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
-    if len(indices_yolo) > 0:
-        for i in indices_yolo.flatten():
-            (x, y) = (boxes[i][0], boxes[i][1])
-            (w, h) = (boxes[i][2], boxes[i][3])
-            color = [int(c) for c in colors_rnd[classIDs[i]]]
-            cv2.rectangle(img_src, (x, y), (x + w, y + h), color, 3)
-            text = "{}: {:.4f}".format(classes_names[classIDs[i]], confidences[i])
-            cv2.putText(img_src, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-
-    cv2.imshow('window', img_src)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-    rawCapture.truncate(0)
-
-cv2.destroyAllWindows()
+        cv2.imshow('window', img_src)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
+            return None
+        else:
+            return detected_objects

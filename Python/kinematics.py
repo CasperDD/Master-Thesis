@@ -10,18 +10,6 @@ class kinematics:
     l = 15 #distance between wheels 
     wheel_circumference = 18.85 #circumference of wheel
     x_y_theta = [0, 0, 0]
-
-    # def __init__(self):
-
-
-    def setTicsToRotate(self, pwm):
-        """ Depending on the pwm, set the amount of tics that is required for one rotation of the wheel """
-        return -0.74 * pwm + 600.15
-    
-
-    def setTics180(self, pwm):
-        """ Depending on the pwm, set the amount of tics for 180 degree turn"""
-        return -0.36 * pwm + 757.73
     
 
     def setCenterOfWheelBase(self, pwm):

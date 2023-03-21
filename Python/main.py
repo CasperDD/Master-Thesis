@@ -25,11 +25,11 @@
 
 # control.stopMotor()
 
-from camera import camera
+# from camera import camera
 
-video = camera()
-video.setup()
-video.getImage()
+# video = camera()
+# video.setup()
+# video.getImage()
 # video.getVideo()
 
 
@@ -103,3 +103,41 @@ video.getImage()
 # test.kinematic.control.setLeftMotor(0, 1)
 # test.kinematic.control.setRightMotor(0, 1)
 # test.kinematic.control.stopMotor()
+
+
+# from yolo import YOLO
+# from camera import Camera 
+# import cv2
+
+# picam = Camera()
+# object_det = YOLO()
+
+# i = 0
+
+# # image = picam.getImage()
+
+
+# while True:
+
+#     image = picam.getImage()
+#     det_obj = object_det.run_yolo(image)
+#     # cv2.imshow("Image", image)
+
+#     print(det_obj)
+#     # i += 1
+
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+# from control import controller
+# import time
+# import math
+
+# cont = controller()
+# cont.goStraight(1000)
+# cont.setLeftMotor(0, 0)
+# cont.setRightMotor(0, 0)
+# time.sleep(5)
+# cont.turn(4 * math.pi)
+# cont.stopMotor()
+
