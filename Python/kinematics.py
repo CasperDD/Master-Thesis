@@ -2,7 +2,7 @@ from control import controller
 import numpy as np
 import math
 
-class kinematics:
+class Kinematics:
     control = controller()
     left_encoder_tics = []
     right_encoder_tics = []

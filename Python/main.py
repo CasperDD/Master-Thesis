@@ -33,12 +33,12 @@
 # video.getVideo()
 
 
-# from rccar import rcCar
+from rccar import rcCar
 
-# rc_car = rcCar()
+rc_car = rcCar()
 
-# while True:
-#     rc_car.key()
+while True:
+    rc_car.key()
 
 
 # from control import controller
@@ -134,7 +134,7 @@
 # import math
 
 # cont = controller()
-# cont.goStraight(1000)
+# cont.goStraight(5000)
 # cont.setLeftMotor(0, 0)
 # cont.setRightMotor(0, 0)
 # time.sleep(5)

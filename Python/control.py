@@ -13,7 +13,7 @@ class controller:
     timer = time.time()
     minSpeed = 200
     maxSpeed = 255
-    speed = 200
+    speed = 180
 
 
     def __init__(self):
