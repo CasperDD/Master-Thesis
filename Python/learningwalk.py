@@ -2,12 +2,14 @@ from kinematics import Kinematics
 from yolo import YOLO
 from camera import Camera
 from MobileNet import MobileNetSSD
-from qr_code import QR
+# from qr_code import QR
+from qr_code import QRCodeDetector
 
 import numpy as np
 import cv2
 import time
 import threading
+from pyzbar import pyzbar
 from typing import List
 from concurrent.futures import Future
 import concurrent.futures
@@ -19,14 +21,18 @@ class learningWalk:
         self.kinematic = Kinematics()
         self.yolo = YOLO()
         self.picam = Camera()
-        self.mobilenet = MobileNetSSD()
-        self.qr = QR()
+        # self.qr = QR()
+        self.qr_detector = QRCodeDetector()
+        
 
         self.center = self.picam.width/2
-        self.w = 0
-        self.h = 0
+        self.w = None
+        self.h = None
+        self.x = None
         
-        self.time_thread = False
+        self.log_thread = False
+        self.vision_thread = False
+        self.x_coord_thread = None
 
         self.encoder_values = []
         self.push_back_encode = False
@@ -35,6 +41,7 @@ class learningWalk:
         self.pred_weight = 0
         self.reflex_weight = 1
         self.reflex_old = 0
+        self.ico_out = 0
 
         self.in_center = False
         self.goal_found = False
@@ -66,6 +73,7 @@ class learningWalk:
         start = time.perf_counter()
         # print("start time: ", start)
         while self.log_thread == True:
+            print("Logging thread")
             self.encoder_values.append(self.kinematic.control.get_encode_values())
             if self.push_back_encode == True:
 
@@ -97,6 +105,8 @@ class learningWalk:
         
         self.pred_weight += self.learn_rate * predict * deri_reflex
         output = self.pred_weight * predict + self.reflex_weight * reflex
+
+        print("ICO output: ", output)
 
         self.reflex_old = reflex
 
@@ -156,52 +166,105 @@ class learningWalk:
 
 
 
-    def x_coord_yolo(self):
-        scene = self.picam.getImage()
+    def x_coord_object(self):
+        while self.vision_thread:
+            print("Qr code thread")
+            scene = self.picam.getImage()
 
-        box_center = self.qr.run_qr(scene)
+            box_center = self.qr.run_qr(scene)
+            
+            if len(box_center) > 0:
+                self.x = box_center[0][0]
+                self.w = box_center[0][2]
+                self.h = box_center[0][3]
+            else:
+                self.x = None
+                self.w = None
+                self.h = None
         
-        x = None
 
-        if len(box_center) > 0:
-            x = box_center[0][0]
-            self.w = box_center[0][2]
-            self.h = box_center[0][3]
+    def detect_qr_code(image):
+        # Convert image to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        return x
+        # Detect QR codes in the image
+        barcodes = pyzbar.decode(gray)
+
+        # Loop over detected QR codes
+        for barcode in barcodes:
+            # Extract QR code data
+            data = barcode.data.decode("utf-8")
+
+            # Print QR code data
+            print("QR Code detected:", data)
+
+            # Return QR code data
+            return data
+
+        # If no QR codes were detected, return None
+        return None
+
+
+    def qrCodeThread(self):
+        cap = cv2.VideoCapture(0)  # 0 is used to select the default camera
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Set the frame width to 640 pixels
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Set the frame height to 480 pixels
+
+        while self.log_thread:
+            ret, frame = cap.read()
+            if not ret:
+                continue
+
+            # Detect QR codes in the image
+            qr_code_data = self.detect_qr_code(frame)
+
+            # Update QR code data
+            self.qr_code_data = qr_code_data
+
 
     #Make the vision part run in a seperate thread
     def searchGoal(self):
+        qr_thread = threading.Thread(target=self.qrCodeThread)
+        qr_thread.start()
+        time.sleep(10)
         self.log_thread = True
         encoder_thread = threading.Thread(target=self.loggingThread)
         encoder_thread.start()
 
+        
         start = time.perf_counter()
         while True:
-            x_coord = self.x_coord_yolo()
 
             end = time.perf_counter()
             time_elapsed = end - start
             print("Time elapsed: ", time_elapsed)
             if time_elapsed > 10:
+                time.sleep(5)
                 print("Time for pirouette")
                 self.push_back_encode = True
                 self.log_thread = False
 
-                predict = self.updateDirVec()
-                print("Init predict: ", predict)
-                
-                # self.log_thread = True
+                predict = self.updateDirVec() + self.ico_out
+                # print("Init predict: ", predict)
+
+                self.log_thread = True
 
                 self.kinematic.control.turn(predict)
-                self.visionTurn(x_coord) 
-                #check if it is still logging here
-                #Need information about how many tics it turns
-                #Also include ICO learning in this
+                self.visionTurn(self.x)
+
+                new_dir_vec = self.updateDirVec()
+                reflex = new_dir_vec - predict
+
+                self.ico_out = self.ICO(predict, reflex)
+
+
+                # check if it is still logging here
+                # Need information about how many tics it turns
+                # Also include ICO learning in this
                 start = time.perf_counter()
             else:
-                print("I did not do pirouette")
-                if x_coord == None:
+                # print("I did not do pirouette")
+                if self.x == None:
                     self.kinematic.control.goStraight(500) # Replace with search algorithm
                 else:
                     if self.w > 200 or self.h > 200:
@@ -209,18 +272,20 @@ class learningWalk:
                         self.kinematic.control.setRightMotor(0, 1)
                         self.goal_found = True
                     else:
-                        self.visionTarget(x_coord)
-                
+                        self.visionTarget(self.x)
+
             if self.goal_found == True:
                 self.push_back_encode = True
                 self.log_thread = False
+                self.vision_thread = False
                 time.sleep(0.1)
                 encoder_thread.join()
                 self.clear()
 
                 print("I ended the while loop")
 
-                break        
+                break
+       
     
     
     def clear(self):
@@ -249,5 +314,3 @@ while i < 5:
     i+= 1
 
 walk.kinematic.control.stopMotor()
-
-print("Encoder tics vec: ", walk.encoder_tics)
