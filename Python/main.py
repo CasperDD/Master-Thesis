@@ -33,12 +33,12 @@
 # video.getVideo()
 
 
-from rccar import rcCar
+# from rccar import rcCar
 
-rc_car = rcCar()
+# rc_car = rcCar()
 
-while True:
-    rc_car.key()
+# while True:
+#     rc_car.key()
 
 
 # from control import controller
@@ -140,4 +140,24 @@ while True:
 # time.sleep(5)
 # cont.turn(4 * math.pi)
 # cont.stopMotor()
+
+
+# import threading
+# import time
+
+# def background_task():
+#     while True:
+#         print("Background task is running...")
+#         time.sleep(1)
+
+# if __name__ == '__main__':
+#     # Create a thread for the background task
+#     background_thread = threading.Thread(target=background_task)
+#     # Start the thread
+#     background_thread.start()
+
+#     # Main code here
+#     while True:
+#         print("Main code is running...")
+#         time.sleep(1)
 

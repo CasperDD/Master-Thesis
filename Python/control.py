@@ -1,6 +1,6 @@
 import pigpio
 import time
-import math
+import numpy as np
 
 
 class controller:
@@ -14,6 +14,7 @@ class controller:
     minSpeed = 200
     maxSpeed = 255
     speed = 180
+    tics_to_rotate = 0
 
 
     def __init__(self):
@@ -51,6 +52,11 @@ class controller:
         if dir <= 0:  # Backward
             self.pi.write(self.pins[4], 0)
             self.pi.write(self.pins[5], 1)
+        
+        if speed > self.maxSpeed:
+            speed = self.maxSpeed
+        if speed < 0:
+            speed = 0
 
         self.pi.set_PWM_dutycycle(self.pins[2], speed)
 
@@ -63,6 +69,11 @@ class controller:
         if dir <= 0:  # Backward
             self.pi.write(self.pins[0], 0)
             self.pi.write(self.pins[1], 1)
+        
+        if speed > self.maxSpeed:
+            speed = self.maxSpeed
+        if speed < 0:
+            speed = 0
         
         self.pi.set_PWM_dutycycle(self.pins[3], speed)
 
@@ -164,12 +175,12 @@ class controller:
         tics_r = 0
         tics_turn = self.setTics180(self.speed)
 
-        tics_to_rotate = (tics_turn / math.pi) * (abs(theta))
+        self.tics_to_rotate = (tics_turn / np.pi) * (abs(theta))
         # print("Tics to rotate: ", tics_to_rotate)
 
         current_encoder = self.get_encode_values()
 
-        while tics_l <= tics_to_rotate and tics_r <= tics_to_rotate:
+        while tics_l <= self.tics_to_rotate and tics_r <= self.tics_to_rotate:
             temp = self.get_encode_values()
 
             if temp[0] != current_encoder[0] or temp[1] != current_encoder[1]:
@@ -181,22 +192,22 @@ class controller:
             current_encoder = temp
 
             if theta < 0:
-                if tics_r <= tics_to_rotate:
+                if tics_r <= self.tics_to_rotate:
                     self.setRightMotor(self.speed, 1)
                 else:
                     self.setRightMotor(0, 1)
 
-                if tics_l <= tics_to_rotate:
+                if tics_l <= self.tics_to_rotate:
                     self.setLeftMotor(self.speed, 0)
                 else:
                     self.setLeftMotor(0, 0)
             else:
-                if tics_r <= tics_to_rotate:
+                if tics_r <= self.tics_to_rotate:
                     self.setRightMotor(self.speed, 0)
                 else:
                     self.setRightMotor(0, 0)
 
-                if tics_l <= tics_to_rotate:
+                if tics_l <= self.tics_to_rotate:
                     self.setLeftMotor(self.speed, 1)
                 else:
                     self.setLeftMotor(0, 1)

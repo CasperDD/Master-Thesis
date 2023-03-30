@@ -65,7 +65,7 @@ import cv2
 
 class Camera:
     width = 160
-    height = 120
+    height = 128
 
     def __init__(self):
         self.camera = PiCamera()
