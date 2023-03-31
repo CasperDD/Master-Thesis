@@ -26,67 +26,48 @@
 #             return detected_objects
 
 
-import threading
-import cv2
-from pyzbar import pyzbar
 
+import cv2
+import threading
+from pyzbar.pyzbar import decode
+from camera import Camera
 
 class QRCodeDetector:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0, cv2.CAP_ANY)
         self.frame = None
-        self.qr_codes = set()
-        self.frame_width = 160
-        self.frame_height = 120
+        self.qr_codes = []
+        self.camera = Camera()
 
     def start(self):
-        # Create a new thread to display the window
-        threading.Thread(target=self._show_window, daemon=True).start()
+        threading.Thread(target=self._run).start()
+
+    def _run(self):
+        # cv2.namedWindow("QR Code Detector", cv2.WINDOW_NORMAL)
+        # cv2.resizeWindow("QR Code Detector", 160, 128)
 
         while True:
-            # Read a frame from the camera
-            ret, frame = self.cap.read()
-            if not ret:
-                break
-            
-            # Resize the frame to reduce processing time
-            frame = cv2.resize(frame, (self.frame_width, self.frame_height))
-
-            # Find QR codes in the frame
-            qr_codes = set()
-            barcodes = pyzbar.decode(frame)
-            for barcode in barcodes:
-                qr_codes.add(barcode.data.decode("utf-8"))
-
-            # Update the current frame and QR codes
-            self.frame = frame
-            self.qr_codes = qr_codes
-
-    def _show_window(self):
-        cv2.namedWindow("QR Code Detector", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("QR Code Detector", self.frame_width, self.frame_height)
-
-        while True:
-            # If we have a frame, show it in the window
             if self.frame is not None:
-                cv2.imshow("QR Code Detector", self.frame)
+                # Convert frame to grayscale and decode QR codes
+                gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+                self.qr_codes = decode(gray)
 
-            # Wait for a key press and handle it
-            key = cv2.waitKey(1)
+                # Display frame with detected QR codes
+                for code in self.qr_codes:
+                    x, y, w, h = code.rect
+                    cv2.rectangle(self.frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                    cv2.putText(self.frame, code.data.decode("utf-8"), (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+                cv2.imshow("QR Code Detector", cv2.resize(self.frame, (160, 128)))
+                self.frame = None
+
+            key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 break
 
-        # Clean up
         cv2.destroyAllWindows()
-        self.cap.release()
+
+    def detect_qr_codes(self, frame):
+        self.frame = frame
 
     def get_qr_codes(self):
         return self.qr_codes
-
-qr_detector = QRCodeDetector()
-
-qr_detector.start()
-
-# Use the QR codes detected by the detector
-qr_codes = qr_detector.get_qr_codes()
-print(qr_codes)

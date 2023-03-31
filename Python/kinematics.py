@@ -74,12 +74,12 @@ class Kinematics:
             rotation_matrix = self.setRotationMatrix(i, pwm)
 
             translation = self.setTranslationVector(i, pwm)
-            print("translatio: ", translation)
+            # print("translatio: ", translation)
 
             ICC = self.setICCVector(i, pwm)
 
             self.x_y_theta = translation @ rotation_matrix + ICC
-            print("x y theta: ", self.x_y_theta)
+            # print("x y theta: ", self.x_y_theta)
 
 
     def directionVector(self):
@@ -95,7 +95,7 @@ class Kinematics:
 
         if turn_angle > np.pi:
             turn_angle = turn_angle - np.pi * 2
-        
+
         direction_vector.append(tic_length)
         direction_vector.append(turn_angle)
 

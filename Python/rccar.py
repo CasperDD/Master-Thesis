@@ -9,23 +9,23 @@ class rcCar:
     
     def __init__(self):
         self.control.initGPIOPins()
-        
+        self.speed = 200
 
     def forwards(self):
-        self.control.setLeftMotor(255, self.forward)
-        self.control.setRightMotor(255, self.forward)
+        self.control.setLeftMotor(self.speed, self.forward)
+        self.control.setRightMotor(self.speed, self.forward)
 
     def backwards(self):
-        self.control.setLeftMotor(255, self.backward)
-        self.control.setRightMotor(255, self.backward)
+        self.control.setLeftMotor(self.speed, self.backward)
+        self.control.setRightMotor(self.speed, self.backward)
 
     def left(self):
-        self.control.setLeftMotor(255, self.backward)
-        self.control.setRightMotor(255, self.forward)
+        self.control.setLeftMotor(self.speed, self.backward)
+        self.control.setRightMotor(self.speed, self.forward)
 
     def right(self):
-        self.control.setLeftMotor(255, self.forward)
-        self.control.setRightMotor(255, self.backward)
+        self.control.setLeftMotor(self.speed, self.forward)
+        self.control.setRightMotor(self.speed, self.backward)
 
     def stop(self):
         self.control.setLeftMotor(0, self.forward)

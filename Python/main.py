@@ -33,6 +33,27 @@
 # video.getVideo()
 
 
+# from control import controller
+# import time
+
+# control = controller()
+# start = time.perf_counter()
+# speed = 170
+# while True:
+#     end = time.perf_counter()
+#     time_elapsed = end - start
+#     if time_elapsed > 0.3:
+#         control.setLeftMotor(0, 1)
+#         control.setRightMotor(0, 1)
+#         time.sleep(2)
+#         start = time.perf_counter()
+#     else:
+#         control.setLeftMotor(speed, 1)
+#         control.setRightMotor(speed, 1)
+    
+
+
+
 # from rccar import rcCar
 
 # rc_car = rcCar()
@@ -172,3 +193,36 @@
 #         break
 # cap.release()
 # cv2.destroyAllWindows()
+
+
+# import cv2
+# import numpy as np
+# from apriltag import Detector, DetectorOptions
+
+# imagepath = 'test.jpg'
+# image = cv2.imread(imagepath, cv2.IMREAD_GRAYSCALE)
+
+# options = DetectorOptions(families='tag36h11') # use tag36h11 tag family
+# detector = Detector(options)
+# detections = detector.detect(image)
+
+# family_name = options.families[0] # get the first family name
+# print('Using tag family:', family_name)
+
+# for det in detections:
+#     print('Detection ID:', det.tag_id)
+#     print('Detection Hamming distance:', det.hamming)
+#     print('Detection center:', det.center)
+#     print('Detection corners:', det.corners)
+#     print('Detection homography:', det.homography)
+#     print('Detection decision margin:', det.decision_margin)
+
+#     # Compute the dimensions
+#     corner_pts = det.corners.astype(np.float32)
+#     width = np.linalg.norm(corner_pts[0] - corner_pts[1])
+#     height = np.linalg.norm(corner_pts[1] - corner_pts[2])
+
+#     print('Detection dimensions:', (width, height))
+#     print('Detection success probability:', det.goodness)
+#     print('--------------------------')
+
