@@ -226,3 +226,215 @@
 #     print('Detection success probability:', det.goodness)
 #     print('--------------------------')
 
+
+
+
+# import pigpio
+# import time
+# from control import controller
+
+# control = controller()
+
+# pi = pigpio.pi()
+# frequency = 1000
+# range = 255
+# pins = (5, 6, 12, 13, 16, 26, 17, 18, 22, 23)
+
+# pi.set_PWM_range(pins[2], range)
+# pi.set_PWM_range(pins[3], range)
+
+# pi.set_PWM_frequency(pins[2], frequency)
+# pi.set_PWM_frequency(pins[3], frequency)
+
+# count = 0
+
+# right_A = pi.read(pins[8])
+# right_B = pi.read(pins[9])
+
+# prev_state = (right_A, right_B)
+
+# control.setLeftMotor(0, 1)
+# control.setRightMotor(0, 1)
+   
+# start = time.perf_counter()
+# time_elapsed = 0
+
+# while True:
+#     start = time.perf_counter()
+#     right_A_prev = right_A
+#     right_B_prev = right_B
+#     left_A = pi.read(pins[8])
+#     left_B = pi.read(pins[9])
+#     right_A = pi.read(pins[6])
+#     right_B = pi.read(pins[7])
+
+#     curr_state = (right_A, right_B)
+
+#     prev_state = curr_state
+
+#     end = time.perf_counter()
+#     time_elapsed = end - start
+#     print("Time elapsed: ", time_elapsed)
+
+
+
+
+
+import pigpio
+import time
+import numpy as np
+from control import controller
+
+control = controller()
+
+pi = pigpio.pi()
+frequency = 1000
+range = 255
+pins = (5, 6, 12, 13, 16, 26, 17, 18, 22, 23)
+
+pi.set_PWM_range(pins[2], range)
+pi.set_PWM_range(pins[3], range)
+
+pi.set_PWM_frequency(pins[2], frequency)
+pi.set_PWM_frequency(pins[3], frequency)
+
+count = 0
+
+right_A = pi.read(pins[8])
+right_B = pi.read(pins[9])
+
+prev_state = (right_A, right_B)
+
+control.setLeftMotor(200, 1)
+control.setRightMotor(200, 1)
+   
+start = time.perf_counter()
+time_elapsed = 0
+
+# control.goStraight(1000)
+
+
+while time_elapsed < 2.13: #True: #time_elapsed < 2.13: 
+    # start = time.perf_counter()
+    right_A_prev = right_A
+    right_B_prev = right_B
+    left_A = pi.read(pins[8])
+    left_B = pi.read(pins[9])
+    right_A = pi.read(pins[6])
+    right_B = pi.read(pins[7])
+
+    curr_state = (right_A, right_B) #, left_A, left_B
+    print(curr_state)
+
+    if prev_state == (0, 0):
+        if curr_state == (0, 1):
+            count += 1
+        elif curr_state == (1, 0):
+            count -= 1
+    elif prev_state == (0, 1):
+        if curr_state == (0, 0):
+            count -= 1
+        elif curr_state == (1, 1):
+            count += 1
+    elif prev_state == (1, 0):
+        if curr_state == (1, 1):
+            count -= 1
+        elif curr_state == (0, 0):
+            count += 1
+    elif prev_state == (1, 1):
+        if curr_state == (1, 0):
+            count += 1
+        elif curr_state == (0, 1):
+            count -= 1
+
+    prev_state = curr_state
+
+    end = time.perf_counter()
+    time_elapsed = end - start
+    # print("Time elapsed: ", time_elapsed)
+    # print("Count: ", count)
+    # time.sleep(0.001)
+
+control.setLeftMotor(0, 1)
+control.setRightMotor(0, 1)
+
+
+
+    # if (right_A_prev != right_A) or (right_B_prev != right_B):
+    #     if (right_A_prev == 0 and right_A == 0) or (right_B_prev == 0 and right_B == 1):
+    #         count += 1
+    #     elif (right_A_prev == 0 and right_A == 1) or (right_B_prev == 1 and right_B == 1):
+    #         count += 1
+    #     elif (right_A_prev == 1 and right_A == 1) or (right_B_prev == 1 and right_B == 0):
+    #         count += 1
+    #     elif (right_A_prev == 1 and right_A == 0) or (right_B_prev == 0 and right_B == 0):
+    #         count += 1
+        
+    #     elif (right_A_prev == 0 and right_A == 1) or (right_B_prev == 0 and right_B == 0):
+    #         count += -1
+    #     elif (right_A_prev == 1 and right_A == 1) or (right_B_prev == 0 and right_B == 1):
+    #         count += -1
+    #     elif (right_A_prev == 1 and right_A == 0) or (right_B_prev == 1 and right_B == 1):
+    #         count += -1
+    #     elif (right_A_prev == 0 and right_A == 0) or (right_B_prev == 1 and right_B == 0):
+    #         count += -1
+
+
+
+
+# import pigpio
+# import time
+# import sys
+# import select  # Import select for cross-platform input detection
+# import numpy as np
+# from control import controller
+
+# control = controller()
+
+# pi = pigpio.pi()
+# frequency = 1000
+# range = 255
+# pins = (5, 6, 12, 13, 16, 26, 17, 18, 22, 23)
+
+# pi.set_PWM_range(pins[2], range)
+# pi.set_PWM_range(pins[3], range)
+
+# pi.set_PWM_frequency(pins[2], frequency)
+# pi.set_PWM_frequency(pins[3], frequency)
+
+# count = 0
+
+# right_A = pi.read(pins[8])
+# right_B = pi.read(pins[9])
+
+# control.setLeftMotor(200, 1)
+# control.setRightMotor(200, 1)
+   
+# time_elapsed_list = []  # List to store time elapsed values
+
+# i = 0
+
+# while i < 1000:
+#     start = time.perf_counter()
+#     temp = control.get_encode_values()
+
+#     print("Encode values left: ", temp[0], temp[1])
+#     # print("Encode values right: ", temp[2], temp[3])
+
+#     end = time.perf_counter()
+#     time_elapsed = end - start
+#     # print("Time elapsed: ", time_elapsed)
+    
+#     time_elapsed_list.append(time_elapsed)  # Append time elapsed to the list
+#     time.sleep(0.0005)
+
+#     i += 1
+#     # if select.select([sys.stdin], [], [], 0)[0]:  # Check if input is available
+#     #     if sys.stdin.readline().strip() == 'q':  # Check if "q" is pressed
+#     #         break
+
+# control.setLeftMotor(0, 1)
+# control.setRightMotor(0, 1)
+
+# average_time_elapsed = sum(time_elapsed_list) / len(time_elapsed_list)  # Calculate average time elapsed
+# print("Average time elapsed: ", average_time_elapsed)

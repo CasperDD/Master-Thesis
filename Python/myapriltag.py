@@ -69,8 +69,8 @@ class AprilTagDetector:
     def detect(self, image):
         self.image = image
         resized_image = cv2.resize(self.image, (self.resize_width, self.resize_height))
-        gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-        tags = self.tag_detector.detect(gray)
+        # gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
+        tags = self.tag_detector.detect(resized_image)
 
         if tags:
             for tag in tags:

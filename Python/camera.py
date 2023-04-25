@@ -83,6 +83,7 @@ class Camera:
         self.camera.capture(self.raw_capture, format="bgr")
         image = self.raw_capture.array
         image = self.imageFlip(image)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # clear the stream in preparation for the next frame
         self.raw_capture.truncate(0)
         # return the image and information

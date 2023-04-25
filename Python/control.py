@@ -1,6 +1,7 @@
 import pigpio
 import time
-import numpy as np
+import math
+# import numpy as np
 
 
 class controller:
@@ -175,7 +176,7 @@ class controller:
         tics_r = 0
         tics_turn = self.setTics180(self.speed)
 
-        self.tics_to_rotate = (tics_turn / np.pi) * (abs(theta))
+        self.tics_to_rotate = (tics_turn / math.pi) * (abs(theta))
         # print("Tics to rotate: ", tics_to_rotate)
 
         current_encoder = self.get_encode_values()
@@ -216,4 +217,4 @@ class controller:
     def stopMotor(self):
         self.setLeftMotor(0, 0)
         self.setRightMotor(0, 0)
-        self.pi.stop() 
+        self.pi.stop()

@@ -3,8 +3,10 @@ import numpy as np
 
 class Kinematics:
     control = controller()
-    left_encoder_tics = []
-    right_encoder_tics = []
+    # left_encoder_tics = []
+    # right_encoder_tics = []
+    left_encoder_tics = 0
+    right_encoder_tics = 0
     time_point = []
     l = 15 #distance between wheels 
     wheel_circumference = 18.85 #circumference of wheel
@@ -70,7 +72,7 @@ class Kinematics:
         translation = np.empty(3)
         ICC = np.empty(3)
         
-        for i in range(len(self.left_encoder_tics)):
+        for i in range(self.left_encoder_tics):
             rotation_matrix = self.setRotationMatrix(i, pwm)
 
             translation = self.setTranslationVector(i, pwm)
@@ -100,12 +102,5 @@ class Kinematics:
         direction_vector.append(turn_angle)
 
         return direction_vector
-
-
-        
-
-
-
-    
 
 
