@@ -59,25 +59,25 @@ int main() {
 // int main() {
 //     Camera camera;
 //     AprilTagDetector detector;
-//     Controller control;
-//     Kinematics kinematics;
+//     // Controller control;
+//     // Kinematics kinematics;
 
-//     control.goStraight(2000);
+//     // control.goStraight(2000);
 
-//     waitKey(1000);
+//     // waitKey(1000);
 
-//     control.turn(10);
+//     // control.turn(10);
 
-//     waitKey(1000);
+//     // waitKey(1000);
 
-//     control.stopMotor();
+//     // control.stopMotor();
 
-//     // while (true)
-//     // {
-//     //     Mat image = camera.getImage();
-//     //     detector.detect(image);
-//     //     // detector.display_window(image);
-//     // }
+//     while (true)
+//     {
+//         Mat image = camera.getImage();
+//         detector.detect(image);
+//         // detector.display_window(image);
+//     }
 //     return 0;
 // }
 
@@ -88,6 +88,7 @@ int main() {
 // #include <chrono>
 // #include <iostream>
 // #include <tuple>
+// #include <thread>
 // // #include "control.h"
 
 // int main() {

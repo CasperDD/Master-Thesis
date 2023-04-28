@@ -51,6 +51,14 @@ chrono
 -
 numeric
 -
+mutex
+-
+condition_variable
+-
+atomic
+-
+fstream
+-
 kinematics.h
 /home/pi/Master-Thesis/CPP/kinematics.h
 camera.h
