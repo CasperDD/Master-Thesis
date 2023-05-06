@@ -33,8 +33,6 @@
 // 	cout<<"Image saved at raspicam_cv_image.jpg"<<endl;
 // }
 
-
-
 #include <iostream>
 #include "learningwalk.h"
 
@@ -46,8 +44,6 @@ int main() {
     return 0;
 }
 
-
-
 // #include <iostream>
 // #include "camera.h"
 // #include "myapriltag.h"
@@ -56,7 +52,8 @@ int main() {
 
 // using namespace std;
 
-// int main() {
+// int main()
+// {
 //     Camera camera;
 //     AprilTagDetector detector;
 //     // Controller control;
@@ -75,14 +72,12 @@ int main() {
 //     while (true)
 //     {
 //         Mat image = camera.getImage();
-//         detector.detect(image);
+//         std::vector<double> apriltags = detector.detect(image);
+//         std::cout << "Center point: (" << apriltags[0] << ", " << apriltags[1] << ")" << std::endl;
 //         // detector.display_window(image);
 //     }
 //     return 0;
 // }
-
-
-
 
 // #include <pigpio.h>
 // #include <chrono>
@@ -165,7 +160,6 @@ int main() {
 //     gpioTerminate();
 //     return 0;
 // }
-
 
 // #include <pigpio.h>
 // #include <chrono>
@@ -254,7 +248,6 @@ int main() {
 //                 count -= 1;
 //             }
 // }
-        
 
 //         // Print curr_state
 //         // std::cout << "Curr State: " << curr_state << std::endl;
@@ -272,9 +265,6 @@ int main() {
 //     gpioTerminate(); // Terminate pigpio
 //     return 0;
 // }
-
-
-
 
 // #include <iostream>
 // #include <chrono>

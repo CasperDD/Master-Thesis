@@ -3,7 +3,6 @@ import time
 import math
 # import numpy as np
 
-
 class controller:
     pi = pigpio.pi()
     frequency = 1000

@@ -3,10 +3,8 @@ import numpy as np
 
 class Kinematics:
     control = controller()
-    # left_encoder_tics = []
-    # right_encoder_tics = []
-    left_encoder_tics = 0
-    right_encoder_tics = 0
+    left_encoder_tics = []
+    right_encoder_tics = []
     time_point = []
     l = 15 #distance between wheels 
     wheel_circumference = 18.85 #circumference of wheel

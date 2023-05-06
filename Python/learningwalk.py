@@ -567,80 +567,80 @@ class learningWalk:
         start = time.perf_counter()
         
         while True:
-            # print(self.push_back_encode.value)
+            print(self.push_back_encode.value)
             self.kinematic.control.goStraight(1000)
             self.pause_logging_process()
-            # self.stop_logging_thread()
-            # print(self.push_back_encode.value)
+            self.stop_logging_thread()
+            print(self.push_back_encode.value)
             time.sleep(5)
             self.resume_logging_process()
-            # predict = self.updateDirVec() + self.ico_out
-            # print("Predict theta: ", predict)
+            predict = self.updateDirVec() + self.ico_out
+            print("Predict theta: ", predict)
             
-            # self.resume_logging_thread()
-            # # self.start_logging_thread()
-            # self.kinematic.control.turn(predict* 1.0) 
-            # time.sleep(5)
-            # print("Negative Predict theta: ", -predict)
-            # self.kinematic.control.turn(-predict * 1.0)
-            # time.sleep(5)
+            self.resume_logging_thread()
+            # self.start_logging_thread()
+            self.kinematic.control.turn(predict* 1.0) 
+            time.sleep(5)
+            print("Negative Predict theta: ", -predict)
+            self.kinematic.control.turn(-predict * 1.0)
+            time.sleep(5)
 
 
-            # end = time.perf_counter()
-            # time_elapsed = end - start
-            # print("Time elapsed: ", time_elapsed)
-            # if time_elapsed > 5:
-            #     time.sleep(2)
-            #     self.push_back_encode = True
-            #     self.stop_logging_thread()
-            #     time.sleep(5)
+            end = time.perf_counter()
+            time_elapsed = end - start
+            print("Time elapsed: ", time_elapsed)
+            if time_elapsed > 5:
+                time.sleep(2)
+                self.push_back_encode = True
+                self.stop_logging_thread()
+                time.sleep(5)
 
-            #     predict = self.updateDirVec() + self.ico_out
-            #     print("Init dir vec: ", predict)
-            #     self.push_back_encode = False
-            #     self.start_logging_thread()
-            #     time.sleep(1)
+                predict = self.updateDirVec() + self.ico_out
+                print("Init dir vec: ", predict)
+                self.push_back_encode = False
+                self.start_logging_thread()
+                time.sleep(1)
                 
-            #     self.kinematic.control.turn(predict)
-            #     self.visionTurn(self.x)
-            #     self.push_back_encode = True
-            #     self.stop_logging_thread()
-            #     time.sleep(1)
+                self.kinematic.control.turn(predict)
+                self.visionTurn(self.x)
+                self.push_back_encode = True
+                self.stop_logging_thread()
+                time.sleep(1)
                 
-            #     new_dir_vec = self.updateDirVec()
-            #     print("New dir vec: ", new_dir_vec)
-            #     reflex = new_dir_vec - predict
-            #     self.ico_out = self.ICO(predict, reflex)
-            #     self.kinematic.control.turn(new_dir_vec)
+                new_dir_vec = self.updateDirVec()
+                print("New dir vec: ", new_dir_vec)
+                reflex = new_dir_vec - predict
+                self.ico_out = self.ICO(predict, reflex)
+                self.kinematic.control.turn(new_dir_vec)
                 
-            #     self.push_back_encode = False
-            #     self.start_logging_thread()
-            #     time.sleep(1)
+                self.push_back_encode = False
+                self.start_logging_thread()
+                time.sleep(1)
                 
-            #     start = time.perf_counter()
-            # else:
-            #     # print("I did not do pirouette")
-            #     if self.x == None:
-            #         self.kinematic.control.goStraight(500) # Replace with search algorithm
-            #     else:
-            #         if self.w > 200 or self.h > 200:
-            #             self.kinematic.control.setLeftMotor(0, 1)
-            #             self.kinematic.control.setRightMotor(0, 1)
-            #             self.goal_found = True
-            #         else:
-            #             self.visionTarget(self.x)
+                start = time.perf_counter()
+            else:
+                # print("I did not do pirouette")
+                if self.x == None:
+                    self.kinematic.control.goStraight(500) # Replace with search algorithm
+                else:
+                    if self.w > 200 or self.h > 200:
+                        self.kinematic.control.setLeftMotor(0, 1)
+                        self.kinematic.control.setRightMotor(0, 1)
+                        self.goal_found = True
+                    else:
+                        self.visionTarget(self.x)
 
-            # if self.goal_found == True:
-            #     self.push_back_encode = True
-            #     self.log_thread = False
-            #     # self.vision_thread = False
-            #     time.sleep(0.1)
-            #     encoder_thread.join()
-            #     self.clear()
+            if self.goal_found == True:
+                self.push_back_encode = True
+                self.log_thread = False
+                # self.vision_thread = False
+                time.sleep(0.1)
+                encoder_thread.join()
+                self.clear()
 
-            #     print("I ended the while loop")
+                print("I ended the while loop")
 
-            #     break
+                break
        
     
     

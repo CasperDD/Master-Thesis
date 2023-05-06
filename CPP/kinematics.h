@@ -6,6 +6,7 @@ class Kinematics
 {
 private:
     double l = 15;                      // distance between wheels
+    double r = 3;                       // radius of wheel
     double wheel_circumference = 18.85; // circumference of wheel
 
     double setTicsToRotate(int pwm)
@@ -15,7 +16,7 @@ private:
 
     double setCenterOfWheelBase(double pwm)
     {
-        return (l / wheel_circumference) * setTicsToRotate(pwm);
+        return ((l/2) / wheel_circumference) * setTicsToRotate(pwm);
     }
 
     void setRotationMatrix(gsl_matrix &rotationmatrix, int i, double pwm)
@@ -84,6 +85,8 @@ public:
     std::vector<int> right_encoder_tics;
     int left_tics = 0;
     int right_tics = 0;
+    int pirouette_left = 0;
+    int pirouette_right = 0;
     std::vector<double> time_point;
     gsl_vector *X_Y_Theta = gsl_vector_alloc(3);
 
@@ -111,23 +114,35 @@ public:
 
     std::vector<double> directionVector()
     {
+        // std::cout << "x_y_theta the theta value: " << gsl_vector_get(X_Y_Theta, 2) << std::endl;
         std::vector<double> direction_vector;
         double tic_length = sqrt(pow(gsl_vector_get(X_Y_Theta, 0), 2) + pow(gsl_vector_get(X_Y_Theta, 1), 2));
+
+        double x = gsl_vector_get(X_Y_Theta, 0);
+        double y = gsl_vector_get(X_Y_Theta, 1);
 
         double angle_to_origin = asin(gsl_vector_get(X_Y_Theta, 1) / tic_length);
 
         double turn_angle = M_PI + (gsl_vector_get(X_Y_Theta, 2) - angle_to_origin);
+        
+        std::cout << "before turn angle: " << turn_angle << std::endl;
 
         if (turn_angle > M_PI)
         {
-            turn_angle = turn_angle - M_PI * 2;
+            turn_angle = turn_angle - 2 * M_PI;
         }
 
         direction_vector.push_back(tic_length);
         direction_vector.push_back(turn_angle);
 
-        // std::cout << "direction vector angle: " << tic_l ength << std::endl;
+        std::cout << "after turn angle: " << turn_angle << std::endl;
+        // std::cout << "Angle to origin: " << angle_to_origin << std::endl;
 
         return direction_vector;
+    }
+
+    void clear_XYTheta()
+    {
+        gsl_vector_set_zero(X_Y_Theta);
     }
 };

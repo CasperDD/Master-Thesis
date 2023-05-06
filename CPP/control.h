@@ -220,14 +220,14 @@ public:
         }
     }
 
-    void turn(float theta)
+    void turn(double theta)
     {
         int tics_l = 0;
         int tics_r = 0;
         int tics_turn = setTics180(speed);
 
         tics_to_rotate = (tics_turn / M_PI) * (fabs(theta));
-        // cout << "Tics to rotate: " << tics_to_rotate << endl;
+        // std::cout << "Tics to rotate: " << tics_to_rotate << std::endl;
 
         auto current_encoder = get_encode_values();
 

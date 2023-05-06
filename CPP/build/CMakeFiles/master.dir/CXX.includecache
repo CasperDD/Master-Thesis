@@ -39,7 +39,13 @@ gsl/gsl_linalg.h
 /home/pi/Master-Thesis/CPP/learningwalk.h
 iostream
 -
+algorithm
+-
 cmath
+-
+ctime
+-
+unistd.h
 -
 opencv2/opencv.hpp
 -
