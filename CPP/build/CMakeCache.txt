@@ -344,7 +344,7 @@ P4COMMAND:FILEPATH=P4COMMAND-NOTFOUND
 PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
 
 //The directory containing a CMake configuration file for RPLidar.
-RPLidar_DIR:PATH=RPLidar_DIR-NOTFOUND
+RPLidar_DIR:PATH=/usr/local/lib/cmake/RPLidar
 
 //Name of the computer/site where compile is being run
 SITE:STRING=raspberrypi
@@ -378,6 +378,9 @@ pkgcfg_lib_GSL_m:FILEPATH=/usr/lib/arm-linux-gnueabihf/libm.so
 
 //The directory containing a CMake configuration file for raspicam.
 raspicam_DIR:PATH=raspicam_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for rplidar.
+rplidar_DIR:PATH=rplidar_DIR-NOTFOUND
 
 
 ########################

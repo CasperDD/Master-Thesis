@@ -61,6 +61,9 @@
         "set": "cpp",
         "fstream": "cpp",
         "mutex": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "bitset": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp"
     }
 }

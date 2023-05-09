@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/pi/Master-Thesis/CPP/build",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++  -isystem /usr/local/include/opencv4 -O3 -DNDEBUG -o CMakeFiles/master.dir/main.cpp.o -c /home/pi/Master-Thesis/CPP/main.cpp",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -isystem /usr/local/include/opencv4 -O3 -DNDEBUG -std=gnu++17 -o CMakeFiles/master.dir/main.cpp.o -c /home/pi/Master-Thesis/CPP/main.cpp",
   "file": "/home/pi/Master-Thesis/CPP/main.cpp"
 }
 ]

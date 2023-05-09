@@ -46,14 +46,19 @@ private:
     bool in_center = false;
     bool pause_log = false;
 
-    double learn_rate = 0.001;
+    double learn_rate = 0.01; //0.1 standard
     double pred_weight = 0.0;
     double reflex_weight = 1.0;
     double reflex_old = 0.0;
     double ico_out = 0.0;
     double predict = 0.0;
-    
-    double radians_turned = 0.0; 
+
+    std::vector<double> predict_file;
+    std::vector<double> reflex_file;
+    std::vector<double> predict_weight_file;
+    std::vector<double> ico_out_file;
+
+    double radians_turned = 0.0;
 
     std::thread log_process;
 
@@ -61,14 +66,17 @@ private:
     std::condition_variable cova;
 
     std::vector<double> vis_xy_id;
-    std::vector<double> theta_file; //Direction vector theta prediction the robot needs to turn
-    std::vector<double> turn_theta_file; //How much the robot turned
+    std::vector<double> theta_file;      // Direction vector theta prediction the robot needs to turn
+    std::vector<double> turn_theta_file; // How much the robot turned
     std::vector<double> periodic_distances;
     std::vector<std::vector<double>> timepoint_file;
 
     std::vector<std::vector<int>> encoder_values;
     std::vector<std::vector<int>> encoder_tics;
     std::vector<std::vector<std::vector<int>>> encoder_tics_file;
+
+    std::vector<int> left_tics_file;
+    std::vector<int> right_tics_file;
 
 public:
     LearningWalk()
@@ -193,14 +201,14 @@ public:
                 }
                 else
                 {
-                    //Used this when going straight. 
-                    //Makes the assumption that both wheel are going the same amount of tics. 
-                    //Another reason to use this is because of an error where one wheel for some reason sometimes count double or more than double
-                    // int minStraightTics = std::min(temp.at(0) * -1, temp.at(1)); 
-                    // kinematic.left_encoder_tics.push_back(minStraightTics);
-                    // kinematic.right_encoder_tics.push_back(minStraightTics);
+                    // Use this when going straight.
+                    // Makes the assumption that both wheel are going the same amount of tics.
+                    // Another reason to use this is because of an error where one wheel for some reason sometimes count double or more than double
+                    //  int minStraightTics = std::min(temp.at(0) * -1, temp.at(1));
+                    //  kinematic.left_encoder_tics.push_back(minStraightTics);
+                    //  kinematic.right_encoder_tics.push_back(minStraightTics);
 
-                    //Use this when you moving around and HAVE! to trust that your encoder reading a true
+                    // Use this when you moving around and HAVE! to trust that your encoder reading a true
                     kinematic.left_encoder_tics.push_back(temp.at(0) * -1);
                     kinematic.right_encoder_tics.push_back(temp.at(1));
 
@@ -229,7 +237,7 @@ public:
                 encoder_values.clear();
             }
         }
-        
+
         // std::cout << "Exitted out of the logging thread" << std::endl;
     }
 
@@ -241,9 +249,18 @@ public:
 
         double output = pred_weight * predict + reflex_weight * reflex;
 
+        std::cout << "Prediction weight: " << pred_weight << std::endl;
+
         std::cout << "ICO output: " << output << std::endl;
 
         std::cout << "Reflex old: " << reflex_old << "  reflex: " << reflex << std::endl;
+
+        std::cout << "derivative reflex: " << deri_reflex << std::endl;
+
+        predict_file.push_back(predict);
+        reflex_file.push_back(reflex);
+        predict_weight_file.push_back(pred_weight);
+        ico_out_file.push_back(output);
 
         reflex_old = reflex;
 
@@ -269,21 +286,39 @@ public:
         return theta;
     }
 
-    void visionTurn(double x)
+    void visionTurn(double x, double theta, int id)
     {
-        if (x == NULL)
+        if (x == NULL || id != 1)
         {
-            control.setLeftMotor(0, 1);
-            control.setRightMotor(0, 1);
+            if (theta < 0 && theta > -M_PI)
+            {
+                control.setRightMotor(control.speed, 1);
+                control.setLeftMotor(control.speed, 0);
+            }
+            else if (theta < 0 && theta < -M_PI)
+            {
+                control.setRightMotor(control.speed, 0);
+                control.setLeftMotor(control.speed, 1);
+            }
+            else if (theta > 0 && theta > M_PI)
+            {
+                control.setRightMotor(control.speed, 1);
+                control.setLeftMotor(control.speed, 0);
+            }
+            else if (theta > 0 && theta < M_PI)
+            {
+                control.setRightMotor(control.speed, 0);
+                control.setLeftMotor(control.speed, 1);
+            }
             in_center = false;
         }
-        else if (x < center - 10)
+        else if (x < center - 10 && id == 1)
         {
             control.setLeftMotor(control.speed, 0);
             control.setRightMotor(control.speed, 1);
             in_center = false;
         }
-        else if (x > center + 10)
+        else if (x > center + 10 && id == 1)
         {
             control.setLeftMotor(control.speed, 1);
             control.setRightMotor(control.speed, 0);
@@ -395,9 +430,8 @@ public:
         my_file << "Actual speed: " << param.at(2) << "\n";
         my_file << "turn_tic: " << param.at(3) << "\n";
 
-        my_file << "\n";
-        my_file << "\n";
-        my_file << "\n";
+        my_file << "\n"
+                << "\n";
 
         my_file << "Theta (what is sent that the robot should turn): "
                 << "\n";
@@ -406,9 +440,8 @@ public:
             my_file << theta_file.at(i) << "\n";
         }
 
-        my_file << "\n";
-        my_file << "\n";
-        my_file << "\n";
+        my_file << "\n"
+                << "\n";
 
         my_file << "Radians turned (how much the robot actually turned): "
                 << "\n";
@@ -417,9 +450,8 @@ public:
             my_file << turn_theta_file.at(i) << "\n";
         }
 
-        my_file << "\n";
-        my_file << "\n";
-        my_file << "\n";
+        my_file << "\n"
+                << "\n";
 
         my_file << "Distance from point x to home: "
                 << "\n";
@@ -427,6 +459,87 @@ public:
         {
             my_file << periodic_distances.at(i) << "\n";
         }
+
+        // If ICO information is not needed comment out the rest of the method
+
+        my_file << "\n"
+                << "\n"
+                << "\n";
+
+        my_file << "ICO information: "
+                << "\n";
+
+        my_file << "Learning rate: " << learn_rate << "\n";
+
+        my_file << "\n"
+                << "\n";
+
+        my_file << "Predict: "
+                << "\n";
+        for (int i = 0; i < predict_file.size(); i++)
+        {
+            my_file << predict_file.at(i) << "\n";
+        }
+
+        my_file << "\n"
+                << "\n";
+
+        my_file << "Reflex: "
+                << "\n";
+        for (int i = 0; i < reflex_file.size(); i++)
+        {
+            my_file << reflex_file.at(i) << "\n";
+        }
+
+        my_file << "\n"
+                << "\n";
+
+        my_file << "Prediction weight: "
+                << "\n";
+        for (int i = 0; i < predict_weight_file.size(); i++)
+        {
+            my_file << predict_weight_file.at(i) << "\n";
+        }
+
+        my_file << "\n"
+                << "\n";
+
+        my_file << "ICO output: "
+                << "\n";
+        for (int i = 0; i < ico_out_file.size(); i++)
+        {
+            my_file << ico_out_file.at(i) << "\n";
+        }
+    }
+
+    void smallFile(std::string file_name)
+    {
+        std::ofstream my_file(file_name);
+        std::vector<double> param = control.parameters();
+
+        my_file << "MaxSpeed: " << param.at(0) << "\n";
+        my_file << "MinSpeed: " << param.at(1) << "\n";
+        my_file << "Actual speed: " << param.at(2) << "\n";
+        my_file << "turn_tic: " << param.at(3) << "\n";
+
+        my_file << "\n"
+                << "\n";
+        
+        my_file << "Left tics: "
+                << "\n";
+        for (int i = 0; i < left_tics_file.size(); i++)
+        {
+            my_file << left_tics_file.at(i) << "\n";
+        }
+
+        my_file << "Right tics: "
+                << "\n";
+        for (int i = 0; i < right_tics_file.size(); i++)
+        {
+            my_file << right_tics_file.at(i) << "\n";
+        }
+
+
     }
 
     void file_variables()
@@ -441,13 +554,6 @@ public:
         encoder_tics_file.push_back(encoder_tics);
         timepoint_file.push_back(kinematic.time_point);
     }
-
-    // Try to change loggingProcess to the log_encoder from the bachelor
-    // and see if you can just start and stop the process instead of all of this pausing and resuming
-
-    // You probably still have problems with your direction vector
-    // The problem is most likely in how you calculate the theta in X_Y_Theta
-    // Or in the way you calculate the angle you need to turn to orego
 
     double turnInPlace(int tics_turned)
     {
@@ -468,33 +574,85 @@ public:
     //         return lowest;
     // }
 
-    // void pirouette(double theta)
-    // {
-    //     resume_logging_process();
-    //     sleep(1);
-    //     pirouette_check = true;
-    //     control.turn(theta);
-    //     pause_logging_process();
-    //     sleep(1);
-    //     push_back_encode = true;
+    void pirouette(double predict)
+    {
+        resume_logging_process();
+        pirouette_check = true;
+        sleep(3);
+        control.turn(predict);
+        push_back_encode = true;
+        sleep(3);
+        pause_logging_process();
+        int prediction_left = kinematic.pirouette_left;
+        int prediction_right = kinematic.pirouette_right;
 
-    //     int highest = std::max(abs(kinematic.pirouette_left), abs(kinematic.pirouette_right));
+        int highest = std::max(abs(prediction_left), abs(prediction_right));
 
-    //     // if (abs(kinematic.pirouette_left) < abs(kinematic.pirouette_right))
-    //     // {
-    //     //     kinematic.pirouette_left = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-    //     // }
-    //     // else
-    //     // {
-    //     //     kinematic.pirouette_right = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-    //     // }
+        double turned_predict = turnInPlace(highest);
 
-    //     double prediction = turnInPlace(highest);
+        std::cout << "Actually turned on predict: " << turned_predict << std::endl;
 
-    //     control.turn(-theta);
+        radians_turned = turnInPlace(highest);
+        turn_theta_file.push_back(radians_turned);
 
-    // }
+        resume_logging_process();
+        pirouette_check = true;
+        sleep(3);
 
+        while (in_center == false)
+        {
+            auto scene = camera.getImage();
+            vis_xy_id = april_tag_detector.detect(scene);
+            double x = vis_xy_id[0];
+            visionTurn(x, predict, vis_xy_id[2]);
+        }
+
+        push_back_encode = true;
+        sleep(3);
+        pause_logging_process();
+
+        int visTurnHighest = std::max(abs(kinematic.pirouette_left), abs(kinematic.pirouette_right));
+        double withVisionTurn = turnInPlace(visTurnHighest);
+
+        std::cout << "Amount turned with visionTurn: " << withVisionTurn << std::endl;
+
+        double reflex = abs(withVisionTurn) - abs(predict);
+        std::cout << "Reflex: " << reflex << std::endl;
+
+        ico_out = ICO(predict, reflex);
+
+        kinematic.pirouette_right = 0;
+        kinematic.pirouette_left = 0;
+
+        resume_logging_process();
+        sleep(3);
+        control.turn(withVisionTurn);
+        push_back_encode = true;
+        sleep(3);
+        pause_logging_process();
+
+        int highest_2 = std::max(abs(kinematic.pirouette_left), abs(kinematic.pirouette_right));
+
+        double turned_back = turnInPlace(highest_2);
+
+        std::cout << "Amount turned back: " << turned_back << std::endl;
+
+        pirouette_check = false;
+        in_center = false;
+        kinematic.pirouette_right = 0;
+        kinematic.pirouette_left = 0;
+
+        // if (abs(kinematic.pirouette_left) < abs(kinematic.pirouette_right))
+        // {
+        //     kinematic.pirouette_left = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
+        // }
+        // else
+        // {
+        //     kinematic.pirouette_right = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
+        // }
+    }
+
+    // Method for control data
     void controlTurn(double theta)
     {
         resume_logging_process();
@@ -510,17 +668,6 @@ public:
 
         int highest = std::max(abs(kinematic.pirouette_left), abs(kinematic.pirouette_right));
 
-        // std::cout << "highest: " << highest << std::endl;
-
-        // if (abs(kinematic.pirouette_left) < abs(kinematic.pirouette_right))
-        // {
-        //     kinematic.pirouette_left = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-        // }
-        // else
-        // {
-        //     kinematic.pirouette_right = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-        // }
-
         radians_turned = turnInPlace(highest);
         turn_theta_file.push_back(radians_turned);
         std::cout << "radians_turned: " << radians_turned << std::endl;
@@ -531,6 +678,7 @@ public:
         kinematic.pirouette_left = 0;
         sleep(3);
     }
+
 
     void searchGoal()
     {
@@ -545,7 +693,7 @@ public:
 
         auto scene = camera.getImage();
         vis_xy_id = april_tag_detector.detect(scene);
-        control.setMotorSpeedDirection(0, 0, 1, 1, false); 
+        control.setMotorSpeedDirection(0, 0, 1, 1, false);
         push_back_encode = true;
 
         sleep(10);
@@ -560,7 +708,6 @@ public:
 
             control.setMotorSpeedDirection(control.speed, control.speed, 1, 1, false); // Change later for actual search algorithm
             push_back_encode = true;
-
 
             if (kinematic.left_tics >= distance && kinematic.right_tics >= distance)
             {
@@ -577,11 +724,15 @@ public:
                 std::cout << "sum left: " << kinematic.left_tics << std::endl;
                 std::cout << "sum right: " << kinematic.right_tics << std::endl;
 
-                predict = updateDirVec();
+                double theta_dirVec = updateDirVec();
+                predict = abs(theta_dirVec) + ico_out;
+                if (theta_dirVec < 0)
+                {
+                    predict = -predict;
+                }
                 std::cout << "Predict: " << predict << std::endl;
 
-                controlTurn(predict);
-
+                pirouette(predict);
 
                 // std::clock_t current_time = std::clock();
                 // double time_elapsed = static_cast<double>(current_time - start_time) / CLOCKS_PER_SEC;
@@ -594,7 +745,7 @@ public:
 
                 if (i == 18)
                 {
-                    std::cout << "i equal 12" << std::endl;
+                    std::cout << "i equal 18" << std::endl;
                     while_loop = false;
                 }
                 else if (i % 6 == 0)
@@ -619,91 +770,94 @@ public:
 
         // std::cout << "exitted searchGoal" << std::endl;
         stop_logging_process();
-        file("/home/pi/Master-Thesis/CPP/Data/ControlData/control_data5.txt");
+        file("/home/pi/Master-Thesis/CPP/Data/StraightICO/StraightICO_lr0.01_data5.txt");
+    }
 
-        // while (i < 4)
-        // {
-        //     // std::cout << "start of while loop" << std::endl;
-        //     start_logging_process();
-        //     std::this_thread::sleep_for(std::chrono::seconds(2));
-        //     for (int j = 0; j < 4; j++) // j < 4, since it takes 4 runs to get accross the arena
-        //     {
-        //         resume_logging_process();
+    void TurnTest()
+    {
+        int i = 1;
+        bool while_loop = true;
+        // push_back_encode.store(false);
+        // apriltag_thread = true;
+        // std::thread april_tag_thread = std::thread(&LearningWalk::aprilTagThread, this);
+        // start_logging_process();
+        start_logging_process();
+        int distance = 500;
 
-        //         control.goStraight(1000);
-        //         pause_logging_process();
-        //         std::this_thread::sleep_for(std::chrono::seconds(2));
-        //         predict = updateDirVec();
-        //         std::cout << "Predict: " << predict << std::endl;
-        //         kinematic.clear_XYTheta();
+        auto scene = camera.getImage();
+        vis_xy_id = april_tag_detector.detect(scene);
+        control.setMotorSpeedDirection(0, 0, 1, 1, false);
+        push_back_encode = true;
 
-        //         resume_logging_process();
-        //         control.turn(-M_PI / 2);
-        //         pause_logging_process();
-        //         std::this_thread::sleep_for(std::chrono::seconds(2));
-        //         predict = updateDirVec();
-        //         std::cout << "Predict: " << predict << std::endl;
-        //         kinematic.clear_XYTheta();
+        sleep(10);
 
-        //         resume_logging_process();
-        //         std::this_thread::sleep_for(std::chrono::seconds(2));
-        //         control.turn(M_PI / 2);
-        //         pause_logging_process();
-        //         std::this_thread::sleep_for(std::chrono::seconds(2));
-        //         predict = updateDirVec();
-        //         std::cout << "Predict: " << predict << std::endl;
-        //         kinematic.clear_XYTheta();
+        // std::clock_t start_time = std::clock();
+        // double duration = 3.7; // 2.5 = 180 degrees - 1.5 = 90 degrees
+        // auto start_time = std::chrono::high_resolution_clock::now();
+        while (while_loop == true)
+        {
+            scene = camera.getImage();
+            vis_xy_id = april_tag_detector.detect(scene);
 
-        //         // // std::cout << "in for loop: " << j << std::endl;
-        //         // control.goStraight(1000);
+            control.setMotorSpeedDirection(control.speed, control.speed, 0, 1, false); // Change later for actual search algorithm
+            push_back_encode = true;
 
-        //         // pause_logging_process();
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        //         // predict = updateDirVec();
-        //         // std::cout << "Predict: " << predict << std::endl;
+            if (abs(kinematic.left_tics) >= distance && abs(kinematic.right_tics) >= distance)
+            {
+                control.setMotorSpeedDirection(0, 0, 1, 1, false);
+                push_back_encode = true;
 
-        //         // resume_logging_process();
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        //         // control.turn(predict);
+                sleep(3);
+                pause_logging_process();
 
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::cout << "sum left: " << kinematic.left_tics << std::endl;
+                std::cout << "sum right: " << kinematic.right_tics << std::endl;
 
-        //         // while (in_center == false)
+                left_tics_file.push_back(kinematic.left_tics);
+                right_tics_file.push_back(kinematic.right_tics);
 
-        //         // {
-        //         //     double x = vis_xy_id[0];
-        //         //     visionTurn(x);
-        //         // }
+                kinematic.left_tics = 0;
+                kinematic.right_tics = 0;
 
-        //         // pause_logging_process();
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        //         // int k = kinematic.left_encoder_tics.size() - 1;
-        //         // double temp = kinematic.thetaTurn(control.speed, k);
-        //         // double reflex = temp;
-        //         // std::cout << "Reflex: " << reflex << std::endl;
-        //         // ico_out = ICO(predict, reflex);
+                bool inner_loop = true;
 
-        //         // in_center = false;
-        //         // predict += ico_out;
-        //         // std::cout << "New predict: " << predict << std::endl;
+                resume_logging_process();
 
-        //         // resume_logging_process();
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        //         // control.turn(-predict);
-        //         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        //     }
-        //     stop_logging_process();
-        //     std::cout << "Iteration of while loop: " << i << std::endl;
-        //     std::this_thread::sleep_for(std::chrono::seconds(20));
-        //     // reset();
-        //     // std::this_thread::sleep_for(std::chrono::seconds(10));
-        //     // std::cout << "Iteration of while loop: " << i << std::endl;
-        //     i++;
-        // }
+                while (inner_loop == true)
+                {
+                    scene = camera.getImage();
+                    vis_xy_id = april_tag_detector.detect(scene);
 
-        // stop_logging_process();
-        // apriltag_thread = false;
-        // april_tag_thread.join();
-        // std::cout << "after ending april tag thread" << std::endl;
+                    control.setMotorSpeedDirection(control.speed, control.speed, 1, 0, false); // Change later for actual search algorithm
+                    push_back_encode = true;
+
+                    if (abs(kinematic.left_tics) >= distance && abs(kinematic.right_tics) >= distance)
+                    {
+                        control.setMotorSpeedDirection(0, 0, 1, 1, false);
+                        push_back_encode = true;
+
+                        sleep(3);
+                        pause_logging_process();
+
+                        std::cout << "sum left: " << kinematic.left_tics << std::endl;
+                        std::cout << "sum right: " << kinematic.right_tics << std::endl;
+
+                        left_tics_file.push_back(kinematic.left_tics);
+                        right_tics_file.push_back(kinematic.right_tics);
+
+                        kinematic.left_tics = 0;
+                        kinematic.right_tics = 0;
+
+                        while_loop = false;
+                        inner_loop = false;
+
+                        resume_logging_process();
+                    }
+                }
+
+            }
+        }
+        stop_logging_process();
+        smallFile("/home/pi/Master-Thesis/CPP/Data/TurningAround/Turn_left_around_data5.txt");
     }
 };

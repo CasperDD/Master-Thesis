@@ -30,7 +30,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 24,
+				"line" : 25,
 				"parent" : 0
 			},
 			{
@@ -52,19 +52,19 @@
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 21,
+				"line" : 22,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 25,
+				"line" : 26,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 23,
+				"line" : 24,
 				"parent" : 0
 			}
 		]
@@ -76,6 +76,9 @@
 			[
 				{
 					"fragment" : "-O3 -DNDEBUG"
+				},
+				{
+					"fragment" : "-std=gnu++17"
 				}
 			],
 			"includes" : 
@@ -354,12 +357,12 @@
 			},
 			{
 				"backtrace" : 6,
-				"fragment" : "-lpigpio",
+				"fragment" : "/usr/local/lib/libRPLidar.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 6,
-				"fragment" : "-lpthread",
+				"fragment" : "-lpigpio",
 				"role" : "libraries"
 			},
 			{
@@ -487,6 +490,11 @@
 			{
 				"backtrace" : 6,
 				"fragment" : "/usr/local/lib/arm-linux-gnueabihf/libopencv_core.so.4.7.0",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "-lpthread",
 				"role" : "libraries"
 			}
 		],

@@ -1,0 +1,20 @@
+MaxSpeed: 255
+MinSpeed: 200
+Actual speed: 200
+turn_tic: 685
+
+
+Left tics: 
+547
+543
+551
+554
+540
+542
+Right tics: 
+584
+563
+579
+570
+561
+570

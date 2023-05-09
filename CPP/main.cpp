@@ -33,16 +33,26 @@
 // 	cout<<"Image saved at raspicam_cv_image.jpg"<<endl;
 // }
 
+
+
+
+
+
 #include <iostream>
 #include "learningwalk.h"
 
 int main() {
     LearningWalk walk;
 
-    walk.searchGoal();
+    walk.TurnTest();
 
     return 0;
 }
+
+
+
+
+
 
 // #include <iostream>
 // #include "camera.h"
@@ -73,11 +83,17 @@ int main() {
 //     {
 //         Mat image = camera.getImage();
 //         std::vector<double> apriltags = detector.detect(image);
-//         std::cout << "Center point: (" << apriltags[0] << ", " << apriltags[1] << ")" << std::endl;
+//         std::cout << "Center point: (" << apriltags[0] << ", " << apriltags[1] << ", " << apriltags[2] << ")" << std::endl;
 //         // detector.display_window(image);
 //     }
 //     return 0;
 // }
+
+
+
+
+
+
 
 // #include <pigpio.h>
 // #include <chrono>
@@ -331,7 +347,11 @@ int main() {
 // 	return 0;
 // }
 
-// #include "RPLidar/rplidar.h"
+
+
+
+
+// #include <RPLidar/rplidar.h>
 // #include <chrono>
 // #include <iostream>
 // #include <thread>
@@ -347,7 +367,7 @@ int main() {
 
 // 	std::cout << "test" << std::endl;
 
-// 	rp.setBaudrate(1000000);
+// 	rp.setBaudrate(115200);
 // 	rp.setMaxDistance(16.0);
 
 // 	std::cout << "here" << std::endl;

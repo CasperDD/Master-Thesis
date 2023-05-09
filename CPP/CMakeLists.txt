@@ -10,6 +10,7 @@ find_package(OpenCV REQUIRED)
 find_package(Threads)
 find_package(raspicam REQUIRED)
 find_package(GSL REQUIRED)
+find_package(RPLidar)
 
 # Set the path to the apriltag library
 set(APRILTAG_LIBRARIES
@@ -31,6 +32,7 @@ TARGET_LINK_LIBRARIES(master
   ${pigpio_LIBS}
   ${raspicam_CV_LIBS}
   ${GSL_LIBRARIES}
+  RPLidar::RPLidar
 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

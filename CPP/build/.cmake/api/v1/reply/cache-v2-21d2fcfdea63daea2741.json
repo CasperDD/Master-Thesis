@@ -2371,7 +2371,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "RPLidar_DIR-NOTFOUND"
+			"value" : "/usr/local/lib/cmake/RPLidar"
 		},
 		{
 			"name" : "SITE",
@@ -2568,6 +2568,18 @@
 			],
 			"type" : "PATH",
 			"value" : "raspicam_DIR-NOTFOUND"
+		},
+		{
+			"name" : "rplidar_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for rplidar."
+				}
+			],
+			"type" : "PATH",
+			"value" : "rplidar_DIR-NOTFOUND"
 		}
 	],
 	"kind" : "cache",

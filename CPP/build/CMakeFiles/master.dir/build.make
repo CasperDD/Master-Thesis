@@ -139,6 +139,7 @@ master: /usr/local/lib/arm-linux-gnueabihf/libopencv_xobjdetect.so.4.7.0
 master: /usr/local/lib/arm-linux-gnueabihf/libopencv_xphoto.so.4.7.0
 master: /usr/local/lib/libgsl.so
 master: /usr/local/lib/libgslcblas.so
+master: /usr/local/lib/libRPLidar.a
 master: /usr/lib/arm-linux-gnueabihf/libmmal_core.so
 master: /usr/lib/arm-linux-gnueabihf/libmmal_util.so
 master: /usr/lib/arm-linux-gnueabihf/libmmal.so
