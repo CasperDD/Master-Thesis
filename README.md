@@ -22,3 +22,7 @@ To run the code on a similar platform a few things are needed:
 
 Optional if visual studio code is used:
 * Have cmake tools and cmake installed
+
+
+##Important information
+This code have only been tested on a mobile robot where it was not able to do a successful learning walk.
