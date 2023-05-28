@@ -20,7 +20,7 @@ public:
     Camera()
     {
         setup(&camera);
-        if (!camera.open()) // Is the camera open
+        if (!camera.open()) // Is the camera open?
         {
             std::cerr << "Error opening camera." << std::endl;
         }
@@ -36,8 +36,8 @@ public:
         camera->setFormat(raspicam::RASPICAM_FORMAT_RGB);
 
         // Set image resolution
-        camera->setWidth(width);   // 640
-        camera->setHeight(height); // 480
+        camera->setWidth(width);
+        camera->setHeight(height); 
 
         // Flip camera image vertically and horizontally
         // because camera is mounted upside down
@@ -45,23 +45,24 @@ public:
         camera->setHorizontalFlip(true); // true
     }
 
+    // Single image
     Mat getImage()
     {
         // capture frames from the camera
         camera.grab();
         camera.retrieve(raw_capture);
-        // cv::cvtColor(raw_capture, raw_capture, cv::COLOR_BGR2GRAY);
         cv::Mat image = cv::Mat(camera.getHeight(), camera.getWidth(), CV_8UC3, raw_capture);
 
         // return the image
         return image;
     }
 
+    // Video stream
+    // Mainly used for testing framerate 
     void getVideo()
     {
         // create window to display the video
         cv::namedWindow("Frame", cv::WINDOW_AUTOSIZE);
-        // cv::Mat frame;
 
         while (true)
         {

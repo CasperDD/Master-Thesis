@@ -2,6 +2,9 @@
 #include <apriltag/apriltag.h>
 #include <apriltag/tagStandard41h12.h>
 
+// Apriltag classed made from the inspiration of:
+// https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#c
+
 class AprilTagDetector
 {
 public:
@@ -18,6 +21,9 @@ public:
         apriltag_detector_destroy(detector_);
     }
 
+    // Detect if an Apriltag is in the image
+    // If there is one in the image return the center x and y coordinates and also the id
+    // Id is used to differentiate the tags so that multiple can be used in the same environment
     std::vector<double> detect(cv::Mat &image)
     {
         cv::Mat gray_image;

@@ -26,10 +26,6 @@ private:
     Camera camera;
     Controller control;
 
-    // int head = 1;
-    // int tail = 1;
-    // int temp = 0;
-
     int center = camera.width / 2;
     int w;
     int h;
@@ -46,9 +42,9 @@ private:
     bool in_center = false;
     bool pause_log = false;
 
-    double learn_rate = 0.01; //0.1 standard
+    double learn_rate = 0.01; //Learning rate for the ICO learning 
     double pred_weight = 0.0;
-    double reflex_weight = 1.0;
+    double reflex_weight = 1.0; 
     double reflex_old = 0.0;
     double ico_out = 0.0;
     double predict = 0.0;
@@ -61,9 +57,6 @@ private:
     double radians_turned = 0.0;
 
     std::thread log_process;
-
-    std::mutex mtx;
-    std::condition_variable cova;
 
     std::vector<double> vis_xy_id;
     std::vector<double> theta_file;      // Direction vector theta prediction the robot needs to turn
@@ -86,6 +79,7 @@ public:
 
     ~LearningWalk() {}
 
+    // Method used to count tics
     int counter(std::pair<int, int> prev_state, std::pair<int, int> curr_state, int count)
     {
         if (prev_state == std::make_pair(0, 0))
@@ -135,6 +129,7 @@ public:
         return count;
     }
 
+    // Method used to figure out the amount of tics on each wheel
     std::vector<int> ticCount(int tail, int head)
     {
         int left_count = 0, right_count = 0;
@@ -159,6 +154,8 @@ public:
         return temp;
     }
 
+    // A process running parallel with the main code
+    // It reads the encoder values and saves them in a vector while in motion
     void loggingProcess()
     {
         // std::cout << " In log encoder " << std::endl;
@@ -180,7 +177,6 @@ public:
             if (push_back_encode)
             {
                 // std::cout << "temp: " << temp << std::endl;
-                // encoder_values.erase(encoder_values.begin(), encoder_values.begin() + temp);
                 head = encoder_values.size();
                 temp = head;
                 // std::cout << "tail: " << tail << std::endl;
@@ -201,14 +197,6 @@ public:
                 }
                 else
                 {
-                    // Use this when going straight.
-                    // Makes the assumption that both wheel are going the same amount of tics.
-                    // Another reason to use this is because of an error where one wheel for some reason sometimes count double or more than double
-                    //  int minStraightTics = std::min(temp.at(0) * -1, temp.at(1));
-                    //  kinematic.left_encoder_tics.push_back(minStraightTics);
-                    //  kinematic.right_encoder_tics.push_back(minStraightTics);
-
-                    // Use this when you moving around and HAVE! to trust that your encoder reading a true
                     kinematic.left_encoder_tics.push_back(temp.at(0) * -1);
                     kinematic.right_encoder_tics.push_back(temp.at(1));
 
@@ -241,6 +229,7 @@ public:
         // std::cout << "Exitted out of the logging thread" << std::endl;
     }
 
+    // Logic for the ICO learning algorithm
     double ICO(double predict, double reflex)
     {
         double deri_reflex = reflex - reflex_old;
@@ -249,6 +238,8 @@ public:
 
         double output = pred_weight * predict + reflex_weight * reflex;
 
+        // Below print statements used to monitor the robot during runs
+        // Can comment out if not needed
         std::cout << "Prediction weight: " << pred_weight << std::endl;
 
         std::cout << "ICO output: " << output << std::endl;
@@ -267,6 +258,7 @@ public:
         return output;
     }
 
+    // Calls kinematic.h to update the direction vector to figure out the prediction 
     double updateDirVec()
     {
         kinematic.positionDirection(control.speed);
@@ -286,6 +278,8 @@ public:
         return theta;
     }
 
+    // Used to adjust the robot so that it faces the center of home
+    // This makes the reflex signal
     void visionTurn(double x, double theta, int id)
     {
         if (x == NULL || id != 1)
@@ -332,94 +326,34 @@ public:
         }
     }
 
-    // void visionTarget(double x)
-    // {
-    //     if (x < center - 10)
-    //     {
-    //         kinematic.control.setLeftMotor(kinematic.control.minSpeed, 1);
-    //         kinematic.control.setRightMotor(kinematic.control.maxSpeed, 1);
-    //         in_center = false;
-    //     }
-    //     else if (x > center + 10)
-    //     {
-    //         kinematic.control.setLeftMotor(kinematic.control.maxSpeed, 1);
-    //         kinematic.control.setRightMotor(kinematic.control.minSpeed, 1);
-    //         in_center = false;
-    //     }
-    //     else
-    //     {
-    //         kinematic.control.setLeftMotor(kinematic.control.speed, 1);
-    //         kinematic.control.setRightMotor(kinematic.control.speed, 1);
-    //     }
-    // }
-
-    // void x_coord_object()
-    // {
-    //     while (vision_thread)
-    //     {
-    //         auto scene = camera.getImage();
-
-    //         std::vector<std::vector<int>> box_center = april_tag_detector.detect(scene);
-
-    //         if (box_center.size() > 0)
-    //         {
-    //             x = box_center[0][0];
-    //             w = box_center[0][2];
-    //             h = box_center[0][3];
-    //         }
-    //         else
-    //         {
-    //             x = NULL;
-    //             w = NULL;
-    //             h = NULL;
-    //         }
-    //     }
-    // }
-
-    void aprilTagThread()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // wait for the thread to start
-
-        while (apriltag_thread == true)
-        {
-            auto scene = camera.getImage();
-            vis_xy_id = april_tag_detector.detect(scene);
-        }
-    }
-
+    // Pause the logging process
     void pause_logging_process()
     {
         push_back_encode = true;
         pause_log = true; // Set pause_log to true when pausing
     }
 
+    // Resume the logging process
     void resume_logging_process()
     {
         pause_log = false; // Reset pause_log to false when resuming
     }
 
+    // Start the logging process
     void start_logging_process()
     {
         log_thread = true;
         log_process = std::thread(&LearningWalk::loggingProcess, this);
     }
 
+    // Stop the logging process
     void stop_logging_process()
     {
         log_thread = false;
         log_process.join();
     }
 
-    void reset()
-    {
-        int head = 1;
-        int tail = 1;
-        int temp = 0;
-        encoder_values.clear();
-
-        // std::cout << "Reset variables: " << head << ", " << tail  << ", " << temp << std::endl;
-    }
-
+    // Method used to save data to a file
     void file(std::string file_name)
     {
         std::ofstream my_file(file_name);
@@ -512,6 +446,7 @@ public:
         }
     }
 
+    // Method used for smaller tests to save data to a file
     void smallFile(std::string file_name)
     {
         std::ofstream my_file(file_name);
@@ -542,19 +477,7 @@ public:
 
     }
 
-    void file_variables()
-    {
-        for (int i = 0; i < kinematic.left_encoder_tics.size(); i++)
-        {
-            std::vector<int> temp;
-            temp.push_back(kinematic.left_encoder_tics.at(i));
-            temp.push_back(kinematic.right_encoder_tics.at(i));
-            encoder_tics.push_back(temp);
-        }
-        encoder_tics_file.push_back(encoder_tics);
-        timepoint_file.push_back(kinematic.time_point);
-    }
-
+    // Method used to make calculate how much the robot have turned in place
     double turnInPlace(int tics_turned)
     {
         int half_turn = control.setTics180(control.speed);
@@ -563,17 +486,8 @@ public:
         return theta;
     }
 
-    // int updateLowTic(int num1, int num2)
-    // {
-    //         int highest = std::max(abs(num1), abs(num2));
-    //         int lowest = std::min(abs(num1), abs(num2));
-
-    //         int difference = highest - lowest;
-    //         lowest = lowest + difference;
-
-    //         return lowest;
-    // }
-
+    // Method to perform the pirouette behaviour
+    // All sleep(3) is needed to make sure the logging process is cought up with the encoder readings
     void pirouette(double predict)
     {
         resume_logging_process();
@@ -641,15 +555,6 @@ public:
         in_center = false;
         kinematic.pirouette_right = 0;
         kinematic.pirouette_left = 0;
-
-        // if (abs(kinematic.pirouette_left) < abs(kinematic.pirouette_right))
-        // {
-        //     kinematic.pirouette_left = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-        // }
-        // else
-        // {
-        //     kinematic.pirouette_right = updateLowTic(kinematic.pirouette_left, kinematic.pirouette_right) * -1;
-        // }
     }
 
     // Method for control data
@@ -679,46 +584,34 @@ public:
         sleep(3);
     }
 
-
+    // Method used for learning walk
+    // Currently only going straight on each wheel before performing a pirouette
     void searchGoal()
     {
         int i = 1;
         bool while_loop = true;
-        // push_back_encode.store(false);
-        // apriltag_thread = true;
-        // std::thread april_tag_thread = std::thread(&LearningWalk::aprilTagThread, this);
-        // start_logging_process();
         start_logging_process();
-        int distance = 500;
+        int distance = 500; // How many tics the robot will go before stopping
 
         auto scene = camera.getImage();
         vis_xy_id = april_tag_detector.detect(scene);
         control.setMotorSpeedDirection(0, 0, 1, 1, false);
         push_back_encode = true;
 
-        sleep(10);
+        sleep(10); // Need the camera and logging process to startup
 
-        // std::clock_t start_time = std::clock();
-        // double duration = 3.7; // 2.5 = 180 degrees - 1.5 = 90 degrees
-        // auto start_time = std::chrono::high_resolution_clock::now();
         while (while_loop == true)
         {
             scene = camera.getImage();
             vis_xy_id = april_tag_detector.detect(scene);
 
-            control.setMotorSpeedDirection(control.speed, control.speed, 1, 1, false); // Change later for actual search algorithm
+            control.setMotorSpeedDirection(control.speed, control.speed, 1, 1, false); // Can be changed to a search/exploration algorithm
             push_back_encode = true;
 
             if (kinematic.left_tics >= distance && kinematic.right_tics >= distance)
             {
                 control.setMotorSpeedDirection(0, 0, 1, 1, false);
                 push_back_encode = true;
-                // Stop the timer and calculate the elapsed time
-                // auto end_time = std::chrono::high_resolution_clock::now();
-                // auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
-
-                // Print the elapsed time in microseconds
-                // std::cout << "Elapsed time: " << elapsed_time.count() << " microseconds" << std::endl;
                 sleep(3);
                 pause_logging_process();
                 std::cout << "sum left: " << kinematic.left_tics << std::endl;
@@ -734,10 +627,6 @@ public:
 
                 pirouette(predict);
 
-                // std::clock_t current_time = std::clock();
-                // double time_elapsed = static_cast<double>(current_time - start_time) / CLOCKS_PER_SEC;
-                // std::cout << "Time: " << time_elapsed << std::endl;
-
                 kinematic.left_tics = 0;
                 kinematic.right_tics = 0;
 
@@ -748,58 +637,48 @@ public:
                     std::cout << "i equal 18" << std::endl;
                     while_loop = false;
                 }
+                // Do not need this if operating in an arena that is big enough for the robot to keep going
                 else if (i % 6 == 0)
                 {
                     std::cout << "20 sec pause" << std::endl;
                     sleep(20);
                 }
                 i++;
-                // pause_logging_process();
-                // std::this_thread::sleep_for(std::chrono::seconds(1));
-                // push_back_encode = true;
-                // predict = updateDirVec();
-                // std::cout << "Predict: " << predict << std::endl;
-                // kinematic.clear_XYTheta();
-                // resume_logging_process();
-                // std::this_thread::sleep_for(std::chrono::seconds(1));
+
                 resume_logging_process();
-                // start_time = std::chrono::high_resolution_clock::now();
-                // start_time = std::clock();
+
             }
         }
 
         // std::cout << "exitted searchGoal" << std::endl;
         stop_logging_process();
+
+        // Rename the file or else the data will be overwritten
         file("/home/pi/Master-Thesis/CPP/Data/StraightICO/StraightICO_lr0.01_data5.txt");
     }
 
+    // Method used to test the robot turning
     void TurnTest()
     {
         int i = 1;
         bool while_loop = true;
-        // push_back_encode.store(false);
-        // apriltag_thread = true;
-        // std::thread april_tag_thread = std::thread(&LearningWalk::aprilTagThread, this);
-        // start_logging_process();
+
         start_logging_process();
-        int distance = 500;
+        int distance = 500; // How many tics the robot will go before stopping
 
         auto scene = camera.getImage();
         vis_xy_id = april_tag_detector.detect(scene);
         control.setMotorSpeedDirection(0, 0, 1, 1, false);
         push_back_encode = true;
 
-        sleep(10);
+        sleep(10); // Need the camera and logging process to startup
 
-        // std::clock_t start_time = std::clock();
-        // double duration = 3.7; // 2.5 = 180 degrees - 1.5 = 90 degrees
-        // auto start_time = std::chrono::high_resolution_clock::now();
         while (while_loop == true)
         {
             scene = camera.getImage();
             vis_xy_id = april_tag_detector.detect(scene);
 
-            control.setMotorSpeedDirection(control.speed, control.speed, 0, 1, false); // Change later for actual search algorithm
+            control.setMotorSpeedDirection(control.speed, control.speed, 0, 1, false); // Can be changed to a search/exploration algorithm
             push_back_encode = true;
 
             if (abs(kinematic.left_tics) >= distance && abs(kinematic.right_tics) >= distance)
@@ -828,7 +707,7 @@ public:
                     scene = camera.getImage();
                     vis_xy_id = april_tag_detector.detect(scene);
 
-                    control.setMotorSpeedDirection(control.speed, control.speed, 1, 0, false); // Change later for actual search algorithm
+                    control.setMotorSpeedDirection(control.speed, control.speed, 1, 0, false); // Can be changed to a search/exploration algorithm
                     push_back_encode = true;
 
                     if (abs(kinematic.left_tics) >= distance && abs(kinematic.right_tics) >= distance)
@@ -858,6 +737,8 @@ public:
             }
         }
         stop_logging_process();
+
+        // Rename the file or else the data will be overwritten
         smallFile("/home/pi/Master-Thesis/CPP/Data/TurningAround/Turn_left_around_data5.txt");
     }
 };

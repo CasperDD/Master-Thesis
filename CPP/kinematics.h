@@ -9,11 +9,14 @@ private:
     double r = 3;                       // radius of wheel
     double wheel_circumference = 18.85; // circumference of wheel
 
+    // Tics for wheel to rotate a full rotation
+    // This is found by observing the rotation of the wheel with different PWM
     double setTicsToRotate(int pwm)
     {
         return -0.74 * pwm + 600.15;
     }
 
+    // Set the center of wheel base, used for the kinematic model.
     double setCenterOfWheelBase(double pwm)
     {
         return ((l/2) / wheel_circumference) * setTicsToRotate(pwm);
@@ -81,15 +84,16 @@ private:
     }
 
 public:
-    std::vector<int> left_encoder_tics;
-    std::vector<int> right_encoder_tics;
-    int left_tics = 0;
-    int right_tics = 0;
-    int pirouette_left = 0;
-    int pirouette_right = 0;
-    std::vector<double> time_point;
-    gsl_vector *X_Y_Theta = gsl_vector_alloc(3);
+    std::vector<int> left_encoder_tics; //left encoder values used to calculate the kinematics and save the "route" the robot have went
+    std::vector<int> right_encoder_tics; //right encoder values used to calculate the kinematics and save the "route" the robot have went
+    int left_tics = 0; //Used to check how much the robot have went on the left wheel
+    int right_tics = 0; //Used to check how much the robot have went on the right wheel
+    int pirouette_left = 0; //Used to check how much the robot have went on the left wheel, during the pirouette
+    int pirouette_right = 0; //Used to check how much the robot have went on the right wheel, during the pirouette
+    std::vector<double> time_point; //The time used to calculate the velocity
+    gsl_vector *X_Y_Theta = gsl_vector_alloc(3); //Vector containing the X, Y and theta of the robot heading
 
+    //Calculate the heading of the robot, using the kinematic
     void positionDirection(double pwm)
     {
         gsl_matrix *rotation_matrix = gsl_matrix_alloc(3, 3);
@@ -112,6 +116,8 @@ public:
         gsl_vector_free(ICC);
     }
 
+    //Make a direction vector that points towards home
+    //Find the amount the robot needs to turn to hit that direction vector
     std::vector<double> directionVector()
     {
         // std::cout << "x_y_theta the theta value: " << gsl_vector_get(X_Y_Theta, 2) << std::endl;
@@ -141,6 +147,7 @@ public:
         return direction_vector;
     }
 
+    //Reset the position
     void clear_XYTheta()
     {
         gsl_vector_set_zero(X_Y_Theta);

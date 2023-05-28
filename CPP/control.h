@@ -9,7 +9,7 @@ class Controller
 private:
     int frequency = 1000;
     int range = 255;
-    int pins[10] = {5, 6, 12, 13, 16, 26, 17, 18, 22, 23};
+    int pins[10] = {5, 6, 12, 13, 16, 26, 17, 18, 22, 23}; //Pins that is being written to and read from
     int n = 6;
     std::vector<std::vector<int>> datalog;
     double timer = time_time();
@@ -40,11 +40,15 @@ public:
         gpioTerminate();
     }
 
+    // Tics for wheel to rotate a full rotation
+    // This is found by observing the rotation of the wheel with different PWM
     double setTicsToRotate(int pwm)
     {
         return -0.74 * pwm + 600.15;
     }
 
+    // Tics for the robot to turn 180
+    // This is found by observing the rotation of the robot with different PWM
     double setTics180(int pwm)
     {
         return -0.36 * pwm + 757.73;
@@ -104,6 +108,7 @@ public:
         gpioPWM(pins[3], speed);
     }
 
+    // Read from the motor encoders
     std::vector<int> get_encode_values()
     {
         int left_A = gpioRead(pins[8]);
@@ -131,6 +136,7 @@ public:
         }
     }
 
+    // Log the motor data
     void logging(int SpeedL, int SpeedR, int dirL, int dirR)
     {
         std::vector<int> temp;
@@ -163,7 +169,7 @@ public:
     {
         int tics_l = 0;
         int tics_r = 0;
-        float pwm_factor = 1.0; // This value need to be adjusted and tested
+        float pwm_factor = 1.0; // This value need to be adjusted and tested. This value "could" help to make the robot go more straight
         std::vector<int> current_encoder = get_encode_values();
 
         while (tics_l <= tics_to_go && tics_r <= tics_to_go)
